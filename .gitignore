@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Clones
+PyMFEM/
+pyglvis/
+BFP.egg-info/
+build/
