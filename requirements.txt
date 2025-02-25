@@ -1,0 +1,15 @@
+numba
+numpy>=1.20.0,<2.0.0
+scipy
+matplotlib
+mpi4py>=3.1.5
+pytest
+h5py
+colorama
+black
+sympy
+pre-commit
+cvxpy
+numba-scipy
+swig>=4.2.1
+cmake
