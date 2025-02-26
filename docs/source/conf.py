@@ -11,11 +11,9 @@ import sys
 sys.path.insert(0, os.path.abspath('../../bfp'))
 
 project = 'BFP'
-project_copyright_info = '2025, Melek Derman'
+copyright = '2025, Melek Derman'
 author = 'Melek Derman'
 release = 'v0.0.1'
-
-master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -41,7 +39,7 @@ autodoc_default_options = {
     'members': True
 }
 
-autoclass_content = 'class'
+autoclass_content = 'both'
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -49,9 +47,8 @@ exclude_patterns = []
 #suppress_warnings = ["myst.xref_missing", "myst.iref_ambiguous"]
 myst_ref_domains = ["std", "py"]
 
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
