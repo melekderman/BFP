@@ -15,7 +15,9 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: mesh
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   mesh
+   solver
+   assembler
+
+
+
