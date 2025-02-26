@@ -51,7 +51,6 @@ This work was supported by the Center for Exascale Monte-Carlo Neutron Transport
 
 BFP is licensed under a BSD-3 clause license. We believe in open source software.
 
-
-## 🌐 Links
+## Links
 - PyMFEM ([github](https://github.com/mfem/pymfem), [pypi](https://pypi.org/project/mfem/))
 - pyglvis ([github](https://github.com/GLVis/pyglvis), [pypi]())

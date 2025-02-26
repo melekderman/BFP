@@ -18,7 +18,7 @@ release = 'v0.0.1'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser', 
+extensions = ['myst_parser',
               'sphinx.ext.autodoc', 
               'sphinx.ext.napoleon', 
               'sphinx.ext.mathjax', 
@@ -26,21 +26,27 @@ extensions = ['myst_parser',
               'sphinx.ext.githubpages' ]
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.11', None),
+    'python': ('https://docs.python.org/3.11', None)
     # 'PyMFEM': ('https://github.com/mfem/PyMFEM', None),
     # 'pyglvis': ('https://github.com/GLVis/pyglvis', None),
 }
 
-napoleon_numpy_docstring = False
+myst_heading_anchors = 2
+napoleon_numpy_docstring = True
 napoleon_google_docstring = True
 
 autodoc_default_options = {
     'members': True
 }
+
 autoclass_content = 'class'
 
 templates_path = ['_templates']
 exclude_patterns = []
+
+suppress_warnings = ["myst.xref_missing", "myst.iref_ambiguous"]
+myst_ref_domains = ["std", "py"]
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
