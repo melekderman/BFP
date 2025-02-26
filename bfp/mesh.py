@@ -1,55 +1,83 @@
 import mfem.par as mfem
 
-def E_1d(L, NE):
-    """
-    1D Mesh (in the E direction)
-    Domain: E ∈ [0, L].
-    NE: Number of elements.
-    """
-    mesh = mfem.Mesh.MakeCartesian1D(NE, L)
-    return mesh
+def E_1d(L: float, NE: int) -> mfem.Mesh:
+    """Generates a 1D mesh in the E direction.
+    
+    Args:
+        L (float): Length of the domain in the E direction.
+        NE (int): Number of elements.
 
-def x_1d(Lx, Nx):
+    Returns:
+        mfem.Mesh: A 1D Cartesian mesh.
     """
-    1D Mesh (in the x direction)
-    Domain: x ∈ [0, Lx].
-    Nx: Number of elements.
-    """
-    mesh = mfem.Mesh.MakeCartesian1D(Nx, Lx)
-    return mesh
+    return mfem.Mesh.MakeCartesian1D(NE, L)
 
-def t_1d(Lt, Nt):
-    """
-    1D Mesh (in the t direction)
-    Domain: t ∈ [0, Lt].
-    Nt: Number of elements.
-    """
-    mesh = mfem.Mesh.MakeCartesian1D(Nt, Lt)
-    return mesh
+def x_1d(Lx: float, Nx: int) -> mfem.Mesh:
+    """Generates a 1D mesh in the x direction.
+    
+    Args:
+        Lx (float): Length of the domain in the x direction.
+        Nx (int): Number of elements.
 
-def xy_2d(Lx, Ly, Nx, Ny):
+    Returns:
+        mfem.Mesh: A 1D Cartesian mesh.
     """
-    2D Mesh (x-y plane)
-    Domain: x ∈ [0, Lx], y ∈ [0, Ly].
-    Nx, Ny: Number of elements in the x and y directions respectively.
-    """
-    mesh = mfem.Mesh.MakeCartesian2D([Nx, Ny], mfem.Element.QUADRILATERAL, Lx, Ly)
-    return mesh
+    return mfem.Mesh.MakeCartesian1D(Nx, Lx)
 
-def xyE_3d(Lx, Ly, E_max, Nx, Ny, NE):
-    """
-    3D Mesh (x, y, E)
-    Domain: x ∈ [0, Lx], y ∈ [0, Ly], E ∈ [0, E_max].
-    Nx, Ny, NE: Number of elements in the x, y, and E directions respectively.
-    """
-    mesh = mfem.Mesh.MakeCartesian3D([Nx, Ny, NE], mfem.Element.HEXAHEDRON, Lx, Ly, E_max)
-    return mesh
+def t_1d(Lt: float, Nt: int) -> mfem.Mesh:
+    """Generates a 1D mesh in the t direction.
+    
+    Args:
+        Lt (float): Length of the domain in the t direction.
+        Nt (int): Number of elements.
 
-def xyz_3d(Lx, Ly, Lz, Nx, Ny, Nz):
+    Returns:
+        mfem.Mesh: A 1D Cartesian mesh.
     """
-    3D Mesh (x, y, z)
-    Domain: x ∈ [0, Lx], y ∈ [0, Ly], z ∈ [0, Lz].
-    Nx, Ny, Nz: Number of elements in the x, y, and z directions respectively.
+    return mfem.Mesh.MakeCartesian1D(Nt, Lt)
+
+def xy_2d(Lx: float, Ly: float, Nx: int, Ny: int) -> mfem.Mesh:
+    """Generates a 2D mesh in the x-y plane.
+    
+    Args:
+        Lx (float): Length of the domain in the x direction.
+        Ly (float): Length of the domain in the y direction.
+        Nx (int): Number of elements in the x direction.
+        Ny (int): Number of elements in the y direction.
+
+    Returns:
+        mfem.Mesh: A 2D Cartesian mesh.
     """
-    mesh = mfem.Mesh.MakeCartesian3D([Nx, Ny, Nz], mfem.Element.HEXAHEDRON, Lx, Ly, Lz)
-    return mesh
+    return mfem.Mesh.MakeCartesian2D([Nx, Ny], mfem.Element.QUADRILATERAL, Lx, Ly)
+
+def xyE_3d(Lx: float, Ly: float, E_max: float, Nx: int, Ny: int, NE: int) -> mfem.Mesh:
+    """Generates a 3D mesh in the x, y, and E directions.
+    
+    Args:
+        Lx (float): Length of the domain in the x direction.
+        Ly (float): Length of the domain in the y direction.
+        E_max (float): Length of the domain in the E direction.
+        Nx (int): Number of elements in the x direction.
+        Ny (int): Number of elements in the y direction.
+        NE (int): Number of elements in the E direction.
+
+    Returns:
+        mfem.Mesh: A 3D Cartesian mesh.
+    """
+    return mfem.Mesh.MakeCartesian3D([Nx, Ny, NE], mfem.Element.HEXAHEDRON, Lx, Ly, E_max)
+
+def xyz_3d(Lx: float, Ly: float, Lz: float, Nx: int, Ny: int, Nz: int) -> mfem.Mesh:
+    """Generates a 3D mesh in the x, y, and z directions.
+    
+    Args:
+        Lx (float): Length of the domain in the x direction.
+        Ly (float): Length of the domain in the y direction.
+        Lz (float): Length of the domain in the z direction.
+        Nx (int): Number of elements in the x direction.
+        Ny (int): Number of elements in the y direction.
+        Nz (int): Number of elements in the z direction.
+
+    Returns:
+        mfem.Mesh: A 3D Cartesian mesh.
+    """
+    return mfem.Mesh.MakeCartesian3D([Nx, Ny, Nz], mfem.Element.HEXAHEDRON, Lx, Ly, Lz)
