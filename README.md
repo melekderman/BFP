@@ -37,15 +37,15 @@ Some versions of pip may produce errors. The version known to work reliably is p
 Details on how to run tests and verify the installation will be added here.
 
 ```
-python input.py -serial
+python test.py -serial
 ```
 ```
-python input.py -parallel
+python test.py -parallel
 ```
 
 ## Acknowledgements
 
-This work was supported by the Center for Exascale Monte-Carlo Neutron Transport (CEMeNT), a PSAAP-III project funded by the Department of Energy, grant number: DE-NA003967.
+This work was supported by the Center for Exascale Monte-Carlo Neutron Transport (CEMeNT) a PSAAP-III project funded by the Department of Energy, grant number: DE-NA003967.
 
 ## License
 
