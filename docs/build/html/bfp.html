@@ -199,7 +199,9 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="mesh.html">Mesh Module Documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="mesh.html">Mesh Module Documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Mesh Module Documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
 </ul>
 
 </div>
@@ -245,11 +247,11 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="module-bfp.mesh">
-<span id="bfp-mesh-module"></span><h2>bfp.mesh module<a class="headerlink" href="#module-bfp.mesh" title="Link to this heading">¶</a></h2>
+<section id="module-mesh">
+<span id="bfp-mesh-module"></span><h2>bfp.mesh module<a class="headerlink" href="#module-mesh" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.E_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">E_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.E_1d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.E_1d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">E_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.E_1d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 1D mesh in the E direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -268,8 +270,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.t_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">t_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.t_1d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.t_1d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">t_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.t_1d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 1D mesh in the t direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -288,8 +290,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.x_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">x_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.x_1d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.x_1d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">x_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.x_1d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 1D mesh in the x direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -308,8 +310,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.xyE_3d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">xyE_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.xyE_3d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.xyE_3d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">xyE_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.xyE_3d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 3D mesh in the x, y, and E directions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -332,8 +334,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.xy_2d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">xy_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.xy_2d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.xy_2d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">xy_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.xy_2d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 2D mesh in the x-y plane.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -354,8 +356,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="bfp.mesh.xyz_3d">
-<span class="sig-prename descclassname"><span class="pre">bfp.mesh.</span></span><span class="sig-name descname"><span class="pre">xyz_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.mesh.xyz_3d" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mesh.xyz_3d">
+<span class="sig-prename descclassname"><span class="pre">mesh.</span></span><span class="sig-name descname"><span class="pre">xyz_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#mesh.xyz_3d" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a 3D mesh in the x, y, and z directions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -378,138 +380,15 @@
 </dd></dl>
 
 </section>
-<section id="module-bfp">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bfp" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.E_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">E_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.E_1d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 1D mesh in the E direction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>L</strong> (<em>float</em>) – Length of the domain in the E direction.</p></li>
-<li><p><strong>NE</strong> (<em>int</em>) – Number of elements.</p></li>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Mesh Module Documentation</a><ul class="simple">
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 1D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.t_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">t_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.t_1d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 1D mesh in the t direction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Lt</strong> (<em>float</em>) – Length of the domain in the t direction.</p></li>
-<li><p><strong>Nt</strong> (<em>int</em>) – Number of elements.</p></li>
+</li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 1D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.x_1d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">x_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.x_1d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 1D mesh in the x direction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Lx</strong> (<em>float</em>) – Length of the domain in the x direction.</p></li>
-<li><p><strong>Nx</strong> (<em>int</em>) – Number of elements.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 1D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.xyE_3d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">xyE_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NE</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.xyE_3d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 3D mesh in the x, y, and E directions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Lx</strong> (<em>float</em>) – Length of the domain in the x direction.</p></li>
-<li><p><strong>Ly</strong> (<em>float</em>) – Length of the domain in the y direction.</p></li>
-<li><p><strong>E_max</strong> (<em>float</em>) – Length of the domain in the E direction.</p></li>
-<li><p><strong>Nx</strong> (<em>int</em>) – Number of elements in the x direction.</p></li>
-<li><p><strong>Ny</strong> (<em>int</em>) – Number of elements in the y direction.</p></li>
-<li><p><strong>NE</strong> (<em>int</em>) – Number of elements in the E direction.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 3D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.xy_2d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">xy_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.xy_2d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 2D mesh in the x-y plane.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Lx</strong> (<em>float</em>) – Length of the domain in the x direction.</p></li>
-<li><p><strong>Ly</strong> (<em>float</em>) – Length of the domain in the y direction.</p></li>
-<li><p><strong>Nx</strong> (<em>int</em>) – Number of elements in the x direction.</p></li>
-<li><p><strong>Ny</strong> (<em>int</em>) – Number of elements in the y direction.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 2D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bfp.xyz_3d">
-<span class="sig-prename descclassname"><span class="pre">bfp.</span></span><span class="sig-name descname"><span class="pre">xyz_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">mfem.par.Mesh</span></span></span><a class="headerlink" href="#bfp.xyz_3d" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a 3D mesh in the x, y, and z directions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Lx</strong> (<em>float</em>) – Length of the domain in the x direction.</p></li>
-<li><p><strong>Ly</strong> (<em>float</em>) – Length of the domain in the y direction.</p></li>
-<li><p><strong>Lz</strong> (<em>float</em>) – Length of the domain in the z direction.</p></li>
-<li><p><strong>Nx</strong> (<em>int</em>) – Number of elements in the x direction.</p></li>
-<li><p><strong>Ny</strong> (<em>int</em>) – Number of elements in the y direction.</p></li>
-<li><p><strong>Nz</strong> (<em>int</em>) – Number of elements in the z direction.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 3D Cartesian mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>mfem.Mesh</p>
-</dd>
-</dl>
-</dd></dl>
-
+</div>
 </section>
 </section>
 
@@ -552,24 +431,16 @@
             <ul>
 <li><a class="reference internal" href="#">bfp package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-bfp.mesh">bfp.mesh module</a><ul>
-<li><a class="reference internal" href="#bfp.mesh.E_1d"><code class="docutils literal notranslate"><span class="pre">E_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.mesh.t_1d"><code class="docutils literal notranslate"><span class="pre">t_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.mesh.x_1d"><code class="docutils literal notranslate"><span class="pre">x_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.mesh.xyE_3d"><code class="docutils literal notranslate"><span class="pre">xyE_3d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.mesh.xy_2d"><code class="docutils literal notranslate"><span class="pre">xy_2d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.mesh.xyz_3d"><code class="docutils literal notranslate"><span class="pre">xyz_3d()</span></code></a></li>
+<li><a class="reference internal" href="#module-mesh">bfp.mesh module</a><ul>
+<li><a class="reference internal" href="#mesh.E_1d"><code class="docutils literal notranslate"><span class="pre">E_1d()</span></code></a></li>
+<li><a class="reference internal" href="#mesh.t_1d"><code class="docutils literal notranslate"><span class="pre">t_1d()</span></code></a></li>
+<li><a class="reference internal" href="#mesh.x_1d"><code class="docutils literal notranslate"><span class="pre">x_1d()</span></code></a></li>
+<li><a class="reference internal" href="#mesh.xyE_3d"><code class="docutils literal notranslate"><span class="pre">xyE_3d()</span></code></a></li>
+<li><a class="reference internal" href="#mesh.xy_2d"><code class="docutils literal notranslate"><span class="pre">xy_2d()</span></code></a></li>
+<li><a class="reference internal" href="#mesh.xyz_3d"><code class="docutils literal notranslate"><span class="pre">xyz_3d()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-bfp">Module contents</a><ul>
-<li><a class="reference internal" href="#bfp.E_1d"><code class="docutils literal notranslate"><span class="pre">E_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.t_1d"><code class="docutils literal notranslate"><span class="pre">t_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.x_1d"><code class="docutils literal notranslate"><span class="pre">x_1d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.xyE_3d"><code class="docutils literal notranslate"><span class="pre">xyE_3d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.xy_2d"><code class="docutils literal notranslate"><span class="pre">xy_2d()</span></code></a></li>
-<li><a class="reference internal" href="#bfp.xyz_3d"><code class="docutils literal notranslate"><span class="pre">xyz_3d()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>

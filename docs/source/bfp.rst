@@ -7,7 +7,7 @@ Submodules
 bfp.mesh module
 ---------------
 
-.. automodule:: bfp.mesh
+.. automodule:: mesh
    :members:
    :show-inheritance:
    :undoc-members:
@@ -15,7 +15,7 @@ bfp.mesh module
 Module contents
 ---------------
 
-.. automodule:: bfp
-   :members:
-   :show-inheritance:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 2
+
+   mesh

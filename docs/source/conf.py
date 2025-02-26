@@ -12,8 +12,6 @@
 
 import os, sys
 
-import os
-import sys
 sys.path.insert(0, os.path.abspath("../../bfp")) 
 
 os.environ['LD_LIBRARY_PATH'] = '/Users/melekderman/github/BFP/PyMFEM/external/mfem/cmbuild_par:' + os.environ.get('LD_LIBRARY_PATH', '')
