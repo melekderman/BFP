@@ -35,4 +35,4 @@
 PyMFEM/
 pyglvis/
 BFP.egg-info/
-build/
+build/bdist.macosx-11.1-arm64
