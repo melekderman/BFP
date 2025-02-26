@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Boltzman Fokker-Plank Transport Solver &#8212; BFP v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=2fea6348"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="mesh Module" href="mesh.html" />
+    <link rel="prev" title="BFP documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="boltzman-fokker-plank-transport-solver">
+<h1>Boltzman Fokker-Plank Transport Solver<a class="headerlink" href="#boltzman-fokker-plank-transport-solver" title="Link to this heading">¶</a></h1>
+<p>This package offers a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with <a class="reference external" href="https://github.com/mfem/PyMFEM">PyMFEM</a> and <a class="reference external" href="https://github.com/GLVis/pyglvis">pyglvis</a>. The following instructions provide guidance on installation, running the solver, and testing.</p>
+<p>To clone this repository, use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">melekderman</span><span class="o">/</span><span class="n">BFP</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>It is recommended to work within isolated environments when installing this package.</p>
+<section id="environment-setup">
+<h3>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading">¶</a></h3>
+<section id="virtual-environment">
+<h4>Virtual Environment<a class="headerlink" href="#virtual-environment" title="Link to this heading">¶</a></h4>
+<p>Create and activate a virtual environment using Python 3.11:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">cd</span> <span class="n">BFP</span>
+    <span class="n">python3</span><span class="mf">.11</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="o">.</span><span class="n">venv</span>
+    <span class="n">source</span> <span class="o">.</span><span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+</pre></div>
+</div>
+</section>
+<section id="conda-environment">
+<h4>Conda Environment<a class="headerlink" href="#conda-environment" title="Link to this heading">¶</a></h4>
+<p>If you prefer using Conda, create and activate an environment as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">BFP</span><span class="o">-</span><span class="n">env</span> <span class="n">python</span><span class="o">==</span><span class="mf">3.11</span>
+    <span class="n">conda</span> <span class="n">activate</span> <span class="n">BFP</span><span class="o">-</span><span class="n">env</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="known-issues-with-pip-version">
+<h3>Known issues with pip version<a class="headerlink" href="#known-issues-with-pip-version" title="Link to this heading">¶</a></h3>
+<p>Some versions of pip may produce errors. The version known to work reliably is pip 23.2.1. Please ensure your pip version is compatible before proceeding with the installation.</p>
+</section>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<p>Details on how to run tests and verify the installation will be added here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">test</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">serial</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">test</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">parallel</span>
+</pre></div>
+</div>
+</section>
+<section id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h2>
+<p>This work was supported by the Center for Exascale Monte-Carlo Neutron Transport (CEMeNT) a PSAAP-III project funded by the Department of Energy, grant number: DE-NA003967.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<p>BFP is licensed under a BSD-3 clause license. We believe in open source software.</p>
+</section>
+<section id="links">
+<h2>Links<a class="headerlink" href="#links" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>PyMFEM (<a class="reference external" href="https://github.com/mfem/pymfem">github</a>, <a class="reference external" href="https://pypi.org/project/mfem/">pypi</a>)</p></li>
+<li><p>pyglvis (<a class="reference external" href="https://github.com/GLVis/pyglvis">github</a>, <a class="reference internal" href="#"><span class="xref myst">pypi</span></a>)</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">BFP</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Boltzman Fokker-Plank Transport Solver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">mesh Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solver.html">solver Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assembler.html">assembler Module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">BFP documentation</a></li>
+      <li>Next: <a href="mesh.html" title="next chapter">mesh Module</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.1</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/installation.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
