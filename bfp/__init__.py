@@ -1,13 +1,2 @@
-__version__ = "0.0.1"
-'''
-import importlib.metadata
-import mfem.par as mfem
-import numpy as np
-import matplotlib.pyplot as plt
-
-from bfp.input_ import (
-)
-import bfp.mesh
-from bfp.main import (
-)
-'''
+from .mesh import E_1d, x_1d, t_1d, xy_2d, xyE_3d, xyz_3d
+__all__ = ["E_1d", "x_1d", "t_1d", "xy_2d", "xyE_3d", "xyz_3d"]

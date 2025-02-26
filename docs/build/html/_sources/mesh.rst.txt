@@ -1,8 +1,8 @@
-mesh Module
-===========
+Mesh Module Documentation
+===========================
 
-.. automodule:: mesh
+.. automodule:: bfp.mesh
    :members:
    :undoc-members:
    :show-inheritance:
-
+   :no-index:
