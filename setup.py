@@ -21,6 +21,16 @@ BANNER = r"""
                                           
           BFT Installation
 """
+with open("requirements.txt") as f:
+    required = f.read().splitlines()
+
+
+setup(
+    name="bfp",
+    version="0.0.1",
+    packages=find_packages(),
+    install_requires=required,
+)
 
 class CustomInstallCommand(install):
     def initialize_options(self):
@@ -116,7 +126,6 @@ setup(
     description="BFP: A Boltzman Fokker-Plank Transport Solver integrating with PyMFEM",
     long_description=open("README.md", encoding="utf-8").read() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
-    install_requires=["requirements.txt"],
     author="Melek Derman",
     author_email="dermanm@oregonstate.edu",
     url="https://github.com/melekderman/BFP",

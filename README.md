@@ -1,5 +1,12 @@
 # Boltzman Fokker-Plank Transport Solver
 
+#![mcdc_logo v1](https://user-images.githubusercontent.com/26186244/173467190-74d9b09a-ef7d-4f0e-8bdf-4a076de7c43c.svg)
+
+#[![Build](https://github.com/CEMeNT-PSAAP/MCDC/actions/workflows/mpi_numba_reg.yml/badge.svg)](https://github.com/CEMeNT-PSAAP/MCDC/actions/workflows/mpi_numba_reg.yml)
+#[![DOI](https://joss.theoj.org/papers/10.21105/joss.06415/status.svg)](https://doi.org/10.21105/joss.06415)
+[![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 This package offers a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with [PyMFEM](https://github.com/mfem/PyMFEM) and [pyglvis](https://github.com/GLVis/pyglvis). The following instructions provide guidance on installation, running the solver, and testing.
 
 To clone this repository, use the following command:
