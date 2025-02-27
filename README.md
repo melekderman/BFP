@@ -1,5 +1,8 @@
 # Boltzman Fokker-Plank Transport Solver
 
+[![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 This package offers a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with [PyMFEM](https://github.com/mfem/PyMFEM) and [pyglvis](https://github.com/GLVis/pyglvis). The following instructions provide guidance on installation, running the solver, and testing.
 
 To clone this repository, use the following command:
