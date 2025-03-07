@@ -8,3 +8,6 @@ cvxpy
 numba-scipy
 swig>=4.2.1
 cmake
+mfem
+glvis
+os
