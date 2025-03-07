@@ -39,3 +39,4 @@ build/bdist.macosx-11.1-arm64
 eg/
 bfp/mesh/usr/
 examples/
+bfp/__all__.py
