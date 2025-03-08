@@ -6,6 +6,7 @@ from glvis import glvis
 __all__ = [
     'glvis_visualize',
     'matplotlib_visualize',
+    'mesh_report'
     ]
 
 ###############################################################################
@@ -75,3 +76,56 @@ def matplotlib_visualize(mesh, solution, E_range, nx, nE, title):
     plt.title(title)
     plt.colorbar(sc, label='Flux')
     plt.show()
+
+
+def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
+    """
+    Print mesh information and visualize the mesh using glvis.
+
+    This function prints the total number of vertices and elements,
+    displays a specified number of vertex coordinates (defaulting to the first 10 if not provided),
+    and then launches the glvis visualization window with the specified dimensions.
+
+    Parameters:
+        mesh : mfem Mesh object
+            The mesh object containing vertices and elements.
+        width : int, optional
+            Width of the glvis window (default is 600).
+        height : int, optional
+            Height of the glvis window (default is 600).
+        num_vertices_to_print : int, optional
+            The number of vertex coordinates to print. If not provided, the first 10 vertices will be printed.
+    """
+    try:
+        total_vertices = mesh.GetNV()
+        print(f"Total number of vertices: {total_vertices}")
+    except Exception as e:
+        print("Error retrieving number of vertices:", e)
+
+    try:
+        total_elements = mesh.GetNE()
+        print(f"Total number of elements: {total_elements}")
+    except Exception as e:
+        print("Error retrieving number of elements:", e)
+
+    count = 10 if num_vertices_to_print is None else int(num_vertices_to_print)
+    print(f"Number of vertices to display: {count}")
+
+    try:
+        vertices = mesh.GetVertexArray()
+        print("Sample vertex coordinates:")
+        for idx, vertex in enumerate(vertices):
+            print(f"Vertex {idx}: {vertex}")
+            if idx + 1 >= count:
+                print("...")
+                break
+    except Exception as e:
+        print("Error retrieving vertex coordinates:", e)
+
+    try:
+        print("Launching glvis visualization...")
+        glvis(mesh, width, height)
+    except ImportError as e:
+        print("glvis module is not available:", e)
+    except Exception as e:
+        print("An error occurred during visualization:", e)

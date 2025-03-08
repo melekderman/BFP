@@ -1,14 +1,17 @@
 import os
 import sys
 import subprocess
+import shutil
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
-# Check for the "--auto" flag on the command line.
-AUTO = False
-if "--auto" in sys.argv:
-    AUTO = True
-    sys.argv.remove("--auto")
+# This is an option for the future, BFT does not work in parallel for now.
+# Parallel modes will be added soon...
+  
+PARALLEL = False
+if "--parallel" in sys.argv:
+    PARALLEL = True
+    sys.argv.remove("--parallel")
 
 BANNER = r"""
  _______        _______      ___________  
@@ -19,93 +22,77 @@ BANNER = r"""
 |: |_)  :)    (:  (             \:  |     
 (_______/      \__/              \__|     
                                           
-          BFT Installation
+          BFP Installation
 """
 
 class CustomInstallCommand(install):
-    def initialize_options(self):
-        install.initialize_options(self)
-        # Use the global AUTO flag.
-        self.auto = AUTO
-
-    def finalize_options(self):
-        install.finalize_options(self)
-
     def run(self):
         print(BANNER)
         cwd = os.getcwd()
 
-        if self.auto:
-            print("Automatic clone and installation mode selected.")
+        dependencies = [
+            "numpy>=1.20.0,<2.0.0",
+            "numba",
+            "numba-scipy",
+            "scipy",
+            "swig>=4.2.1",
+            "cmake",
+            "anywidget>=0.9.9",
+            "ipywidgets>=8.0.0",
+            "requests"
+        ]
 
-            # First, install additional dependencies from requirements.txt if it exists.
-            req_file = os.path.join(cwd, "requirements.txt")
-            if os.path.exists(req_file):
-                print("Installing additional dependencies from requirements.txt...")
-                try:
-                    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", req_file])
-                except subprocess.CalledProcessError as e:
-                    print("Failed to install requirements:", e)
-                    sys.exit(1)
-            else:
-                print("No requirements.txt found. Skipping additional dependency installation.")
+        print("Installing dependencies...")
+        for dep in dependencies:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", dep])
 
-            # --- Clone and install PyMFEM (always in parallel mode) ---
-            pymfem_dir = os.path.join(cwd, "PyMFEM")
-            if not os.path.exists(pymfem_dir):
-                try:
-                    print("Cloning PyMFEM repository...")
-                    subprocess.check_call(["git", "clone", "https://github.com/melekderman/PyMFEM.git"])
-                except subprocess.CalledProcessError as e:
-                    print("Failed to clone PyMFEM repository:", e)
-                    sys.exit(1)
-            else:
-                print("PyMFEM repository already exists. Skipping clone.")
+        # PyMFEM
+        pymfem_dir = os.path.join(cwd, "PyMFEM")
+        if os.path.exists(pymfem_dir):
+            print("Removing existing PyMFEM directory...")
+            shutil.rmtree(pymfem_dir)
 
-            # --- Ensure mpi4py is installed (required by PyMFEM) ---
-            try:
-                import mpi4py
-            except ImportError:
-                print("mpi4py is not installed. Installing mpi4py...")
-                try:
-                    subprocess.check_call([sys.executable, "-m", "pip", "install", "mpi4py"])
-                except subprocess.CalledProcessError as e:
-                    print("Failed to install mpi4py:", e)
-                    sys.exit(1)
+        print("Cloning PyMFEM repository...")
+        subprocess.check_call(["git", "clone", "https://github.com/melekderman/PyMFEM.git", pymfem_dir])
 
-            try:
-                print("Installing PyMFEM (parallel mode)...")
-                os.chdir(pymfem_dir)
+        os.chdir(pymfem_dir)
+        try:
+            if PARALLEL:
+                print("Installing PyMFEM with parallel support...")
                 subprocess.check_call([sys.executable, "setup.py", "install", "--with-parallel"])
-                os.chdir(cwd)
-            except subprocess.CalledProcessError as e:
-                print("PyMFEM installation failed:", e)
-                sys.exit(1)
-
-            # --- Clone and install pyglvis ---
-            pyglvis_dir = os.path.join(cwd, "pyglvis")
-            if not os.path.exists(pyglvis_dir):
-                try:
-                    print("Cloning pyglvis repository...")
-                    subprocess.check_call(["git", "clone", "https://github.com/melekderman/pyglvis.git"])
-                except subprocess.CalledProcessError as e:
-                    print("Failed to clone pyglvis repository:", e)
-                    sys.exit(1)
             else:
-                print("pyglvis repository already exists. Skipping clone.")
+                print("Installing PyMFEM (standard mode)...")
+                subprocess.check_call([sys.executable, "setup.py", "install"])
+        except subprocess.CalledProcessError as e:
+            print("PyMFEM installation failed:", e)
+            sys.exit(1)
+        finally:
+            os.chdir(cwd)
+            print("Cleaning up PyMFEM directory...")
+            shutil.rmtree(pymfem_dir)
 
-            try:
-                print("Installing pyglvis...")
-                os.chdir(pyglvis_dir)
-                subprocess.check_call([sys.executable, "-m", "pip", "install", "."])
-                os.chdir(cwd)
-            except subprocess.CalledProcessError as e:
-                print("pyglvis installation failed:", e)
-                sys.exit(1)
-        else:
-            print("Automatic clone and installation not selected. Installing only the main module.")
+        # PyGLVis
+        pyglvis_dir = os.path.join(cwd, "pyglvis")
+        if os.path.exists(pyglvis_dir):
+            print("Removing existing pyglvis directory...")
+            shutil.rmtree(pyglvis_dir)
 
-        # Finally, install the main package (e.g. with matplotlib as a dependency)
+        print("Cloning pyglvis repository...")
+        subprocess.check_call(["git", "clone", "https://github.com/melekderman/pyglvis.git", pyglvis_dir])
+
+        os.chdir(pyglvis_dir)
+        try:
+            print("Installing pyglvis...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "."])
+        except subprocess.CalledProcessError as e:
+            print("pyglvis installation failed:", e)
+            sys.exit(1)
+        finally:
+            os.chdir(cwd)
+            print("Cleaning up pyglvis directory...")
+            shutil.rmtree(pyglvis_dir)
+
+        # Finally, install the main package
         install.run(self)
 
 setup(
@@ -113,10 +100,20 @@ setup(
     version="0.0.1",
     packages=find_packages(),
     include_package_data=True,
-    description="BFP: A Boltzman Fokker-Plank Transport Solver integrating with PyMFEM",
+    description="BFP: A Boltzmann Fokker-Planck Charged Particle Transport Solver integrating with PyMFEM",
     long_description=open("README.md", encoding="utf-8").read() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
-    install_requires=["requirements.txt"],
+    install_requires=[
+    "numpy>=1.20.0,<2.0.0",
+    "numba",
+    "numba-scipy",
+    "scipy",
+    "swig>=4.2.1",
+    "cmake",
+    "anywidget>=0.9.9",
+    "ipywidgets>=8.0.0",
+    "requests"
+],
     author="Melek Derman",
     author_email="dermanm@oregonstate.edu",
     url="https://github.com/melekderman/BFP",

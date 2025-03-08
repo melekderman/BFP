@@ -19,7 +19,7 @@ from .coeff import (
     EnergyDependentCoefficient,
     VelocityCoefficient
 )
-from .vis import glvis_visualize, matplotlib_visualize
+from .vis import glvis_visualize, matplotlib_visualize, mesh_report
 
 __all__ = [
     # mesh.py
@@ -44,4 +44,5 @@ __all__ = [
     # vis.py
     'glvis_visualize',
     'matplotlib_visualize',
+    'mesh_report',
 ]

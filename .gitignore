@@ -38,5 +38,5 @@ BFP.egg-info/
 build/bdist.macosx-11.1-arm64
 eg/
 bfp/mesh/usr/
-examples/
+examples1/
 bfp/__all__.py
