@@ -28,8 +28,7 @@ jobs:
         pip install pytest numpy matplotlib
 
     - name: Install bfp
-      run: |
-        pip install .
+      run: python setup.py install
 
     - name: Run unit tests
       run: |
