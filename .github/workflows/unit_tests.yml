@@ -65,7 +65,7 @@ jobs:
       - name: Build PyMFEM Wheel
         if: steps.cache-pymfem.outputs.cache-hit != 'true'
         run: |
-          git clone --branch stable https://github.com/melekderman/PyMFEM.git /tmp/mfem
+          git clone https://github.com/melekderman/PyMFEM.git /tmp/mfem
           cd /tmp/mfem
           pip wheel . -w dist
 
@@ -80,10 +80,10 @@ jobs:
           path: /tmp/pyglvis/dist
           key: pyglvis-wheel
 
-      - name: Build PyGLVis Wheel (if not cached)
+      - name: Build PyGLVis Wheel
         if: steps.cache-pyglvis.outputs.cache-hit != 'true'
         run: |
-          git clone --branch stable https://github.com/melekderman/pyglvis.git /tmp/pyglvis
+          git clone https://github.com/melekderman/pyglvis.git /tmp/pyglvis
           cd /tmp/pyglvis
           pip wheel . -w dist
 
