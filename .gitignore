@@ -40,3 +40,6 @@ eg/
 bfp/mesh/usr/
 examples1/
 bfp/__all__.py
+
+# Cache folder
+bfp/__pycache__/

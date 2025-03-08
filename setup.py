@@ -39,7 +39,8 @@ class CustomInstallCommand(install):
             "cmake",
             "anywidget>=0.9.9",
             "ipywidgets>=8.0.0",
-            "requests"
+            "requests",
+            "h5py",
         ]
 
         print("Installing dependencies...")
@@ -110,7 +111,8 @@ setup(
     "cmake",
     "anywidget>=0.9.9",
     "ipywidgets>=8.0.0",
-    "requests"
+    "requests",
+    "h5py",
 ],
     author="Melek Derman",
     author_email="dermanm@oregonstate.edu",

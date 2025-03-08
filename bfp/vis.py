@@ -99,13 +99,13 @@ def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
     try:
         total_vertices = mesh.GetNV()
         print(f"Total number of vertices: {total_vertices}")
-    except Exception as e:
+    except AttributeError as e:
         print("Error retrieving number of vertices:", e)
 
     try:
         total_elements = mesh.GetNE()
         print(f"Total number of elements: {total_elements}")
-    except Exception as e:
+    except AttributeError as e:
         print("Error retrieving number of elements:", e)
 
     count = 10 if num_vertices_to_print is None else int(num_vertices_to_print)
@@ -119,7 +119,7 @@ def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
             if idx + 1 >= count:
                 print("...")
                 break
-    except Exception as e:
+    except AttributeError as e:
         print("Error retrieving vertex coordinates:", e)
 
     try:
@@ -127,5 +127,5 @@ def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
         glvis(mesh, width, height)
     except ImportError as e:
         print("glvis module is not available:", e)
-    except Exception as e:
+    except RuntimeError as e:
         print("An error occurred during visualization:", e)
