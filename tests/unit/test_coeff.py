@@ -17,7 +17,6 @@ class IntegrationPointMock:
     def __getitem__(self, idx):
         return [0, self.y][idx]
 
-
 class TestCoefficients(unittest.TestCase):
 
     def test_TotalXSCoefficient(self):
@@ -83,7 +82,6 @@ class TestCoefficients(unittest.TestCase):
         coeff._EvalPy(V, [0, 0.5])
         self.assertAlmostEqual(V[0], mu)
         self.assertAlmostEqual(V[1], 4.0)
-
 
 if __name__ == '__main__':
     unittest.main()
