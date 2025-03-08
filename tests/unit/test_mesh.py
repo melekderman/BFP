@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 import numpy as np
-from mesh import create_2D_mesh, create_3D_mesh
+from bfp.mesh import create_2D_mesh, create_3D_mesh
 
 
 class TestMeshCreation(unittest.TestCase):
