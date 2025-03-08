@@ -12,13 +12,13 @@ __all__ = [
 # Visualizers:
 ###############################################################################
 
+
 def glvis_visualize(mesh, solution, title="CSDA Transport Solution"):
-    """
-    Visualize the solution using GLVis.
+    """Visualize the solution using GLVis.
 
     Args:
-        mesh (mfem.Mesh): The computational mesh.
-        solution (mfem.GridFunction): The solution grid function.
+        mesh: The computational mesh.
+        solution: The solution grid function.
         title (str): Title for the GLVis window.
     """
     ss = mfem.socketstream("localhost", 19916)
@@ -30,17 +30,17 @@ def glvis_visualize(mesh, solution, title="CSDA Transport Solution"):
     solution.Save(ss)
     ss.send_text("\n")
 
-def matplotlib_visualize(mesh, solution, E_range, nx, nE):
-    """
-    Visualize the solution using matplotlib.
+
+def matplotlib_visualize(mesh, solution, E_range, nx, nE, title):
+    """Visualize the solution using matplotlib.
 
     Assumes the mesh is a structured Cartesian mesh.
     The y-coordinate is mapped to energy using:
          E = E_start - y*(E_start - E_end).
 
     Args:
-        mesh (mfem.Mesh): The computational mesh.
-        solution (mfem.GridFunction): The solution grid function.
+        mesh: The computational mesh.
+        solution: The solution grid function.
         E_range (tuple): (E_end, E_start) for energy mapping.
         nx (int): Number of spatial elements.
         nE (int): Number of energy groups.
@@ -72,6 +72,6 @@ def matplotlib_visualize(mesh, solution, E_range, nx, nE):
     sc = plt.scatter(x_coords, E_values, c=sol, cmap='viridis')
     plt.xlabel('x')
     plt.ylabel('Energy (MeV)')
-    plt.title('CSDA Transport Solution')
+    plt.title(title)
     plt.colorbar(sc, label='Flux')
     plt.show()

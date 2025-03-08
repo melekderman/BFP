@@ -36,7 +36,7 @@ class TotalXSCoefficient(mfem.PyCoefficient):
         self.E_end = E_end
 
     def EvalValue(self, x):
-        """Maps the total cross-section at a given energy coordinate.
+        """Evaluates the total cross-section at a given energy coordinate.
 
         This method converts the normalized energy coordinate found in x[1] to the actual 
         energy value and determines the corresponding energy group to return the associated 
@@ -77,7 +77,7 @@ class ScatteringXSCoefficient(mfem.PyCoefficient):
         self.E_end = E_end
 
     def EvalValue(self, x):
-        """Maps the scattering cross-section at a given normalized energy coordinate.
+        """Evaluates the scattering cross-section at a given normalized energy coordinate.
 
         This method converts the normalized energy coordinate from x[1] to an energy value
         and maps that to a corresponding energy group, returning the scattering cross-section 
@@ -209,34 +209,34 @@ class InflowCoefficient(mfem.PyCoefficient):
 class QCoefficient(mfem.PyCoefficient):
     """Coefficient for the source term Q(x, E).
 
-    This coefficient maps the normalized energy coordinate (x[1] in [0, 1]) to the corresponding
-    source term Q value. Here, y = 0 corresponds to E = E_start and y = 1 corresponds to E = E_end.
+    This coefficient returns a constant source value if Q_data is provided as a scalar.
+    Otherwise, it maps the source value based on the normalized energy coordinate.
 
-    If Q_data is given as the scalar 0, then the coefficient always returns 0 and E_start and E_end are not required.
+    Attributes:
+        Q_data (float or list): Constant or energy-dependent source values.
+        E_start (float): Minimum energy for interpolation range.
+        E_end (float): Maximum energy for interpolation.
     """
 
     def __init__(self, Q_data, E_start=None, E_end=None):
         super(QCoefficient, self).__init__()
-
-        if isinstance(Q_data, (int, float)) and Q_data == 0:
-            self.scalar_zero = True
-            self.Q_data = None
+        if isinstance(Q_data, (int, float)):
+            self.scalar_constant = True
+            self.Q_data = Q_data
         else:
             if E_start is None or E_end is None:
-                raise ValueError("For non-zero Q_data, E_start and E_end must be provided.")
-            self.scalar_zero = False
-            if isinstance(Q_data, (int, float)):
-                self.Q_data = [Q_data]
-            else:
-                self.Q_data = Q_data
+                raise ValueError("E_start and E_end must be provided for energy-dependent Q_data.")
+            self.scalar_constant = False
+            self.Q_data = Q_data
             self.E_start = E_start
             self.E_end = E_end
 
     def EvalValue(self, x):
         """Evaluates the source term Q at a given coordinate.
 
-        For a non-zero Q_data, this method converts the normalized energy coordinate x[1] to the corresponding
-        energy value and returns the Q value for the associated energy group. If Q_data is zero, it always returns 0.
+        For non-constant Q_data, this method converts the normalized energy coordinate x[1] to the corresponding
+        energy value and returns the Q value for the associated energy group. If Q_data is constant, it always 
+        returns this constant value.
 
         Args:
             x (list or array-like): The coordinate array where x[1] is the normalized energy (in [0, 1]).
@@ -244,9 +244,10 @@ class QCoefficient(mfem.PyCoefficient):
         Returns:
             float: The source term Q value corresponding to the computed energy, or 0.0 if Q_data is zero.
         """
-        if self.scalar_zero:
-            return 0.0
 
+        if self.scalar_constant:
+            return float(self.Q_data)
+        
         y = x[1]
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.Q_data)
@@ -276,22 +277,22 @@ class EnergyDependentCoefficient(mfem.PyCoefficient):
         self.E_start = E_start
         self.E_end = E_end
 
-    def EvalValue(self, j):
+    def EvalValue(self, x):
         """Evaluates the coefficient at a given normalized energy coordinate.
 
-        This method converts the normalized energy coordinate (j[1]) to a physical energy
+        This method converts the normalized energy coordinate (x[1]) to a physical energy
         value, determines the corresponding index (group) in the data array via linear interpolation,
         and returns the associated coefficient value.
 
         Args:
-            j (list or array-like): Integration point coordinates, where j[1] is the normalized 
-                                    energy in the range [0, 1]. The j[0] coordinate is ignored.
+            x (list or array-like): Integration point coordinates, where x[1] is the normalized 
+                                    energy in the range [0, 1].
 
         Returns:
             float: The interpolated coefficient value corresponding to the computed energy.
         """
         # Extract normalized energy from the integration point.
-        y = j[1]
+        y = x[1]
         # Map the normalized energy coordinate to the physical energy value.
         energy = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.data)

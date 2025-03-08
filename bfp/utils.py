@@ -11,8 +11,8 @@ __all__ = [
 # Utilities:
 ###############################################################################
 
+
 def read_data(nE):
-    
     """Read cross-section and stopping power data from an HDF5 file.
 
     Args:
@@ -40,7 +40,6 @@ def read_data(nE):
 
 
 def gauss_legendre_dirs(N_dir):
-
     """Compute Gauss-Legendre quadrature points and weights for discrete ordinates.
 
     This function computes the Gauss-Legendre quadrature points (mu_i) and weights (w_i)
@@ -67,12 +66,13 @@ def compute_S_derivative(E, S):
     central differences for all interior points.
 
     Args:
-        E (numpy.ndarray): 1D array of energy values.
-        S (numpy.ndarray): 1D array of S values corresponding to the energy values.
+        E (np.ndarray): 1D array of energy values.
+        S (np.ndarray): 1D array of S values corresponding to the energy values.
 
     Returns:
         numpy.ndarray: Array of the finite difference approximations of dS/dE.
     """
+
     n = len(S)
     dS_dE = np.zeros(n)
     
@@ -87,4 +87,3 @@ def compute_S_derivative(E, S):
     dS_dE[-1] = (S[-1] - S[-2]) / (E[-1] - E[-2])
     
     return dS_dE
-

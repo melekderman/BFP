@@ -11,8 +11,7 @@ __all__ = ['create_2D_mesh',
 ###############################################################################
 
 def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
-    """
-    Creates a 2D mesh with the specified intervals and coordinate ranges.
+    """Creates a 2D mesh with the specified intervals and coordinate ranges.
 
     Args:
         nx (int): Number of intervals in the x-direction.
@@ -25,6 +24,7 @@ def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
     Returns:
         mesh: The updated mesh with vertex coordinates set accordingly.
     """
+
     # Generate equally spaced coordinates for x and y
     x_coords = np.linspace(x_start, x_end, nx + 1)
     y_coords = np.linspace(y_start, y_end, ny + 1)
@@ -79,7 +79,11 @@ x_max = 0.3
 y_start = 1.0
 y_end = 0.01
 
+# Create the mesh
 mesh = create_custom_mesh(nx, ny, x_min, x_max, y_start, y_end)
+
+# Plot the mesh using glvis
+glvis(mesh)
 
 # Print updated vertices for verification
 verts = mesh.GetVertexArray()
@@ -92,8 +96,7 @@ for k, v in enumerate(verts):
 ###############################################################################
     
 def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
-    """
-    Creates a 3D mesh with specified intervals and coordinate ranges.
+    """Creates a 3D mesh with specified intervals and coordinate ranges.
 
     Args:
         nx (int): Number of intervals in the x-direction.
@@ -126,7 +129,7 @@ def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
     if num_verts != expected_num:
         print("Warning: Unexpected number of vertices! ({} != {})".format(num_verts, expected_num))
     
-    # Update the vertex coordinates; vertices are stored in order: x changes fastest, then y, then z.
+    # Update the vertex coordinates; vertices are stored in order: x, y, z.
     k = 0
     for k_z in range(nz + 1):
         for k_y in range(ny + 1):
@@ -168,7 +171,11 @@ y_end = 0.01
 z_start = 0.0
 z_end = 0.3
 
+# Create the mesh
 mesh2 = create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end)
+
+# Plot the mesh using glvis
+glvis(mesh)
 
 # Print updated vertices for verification:
 verts2 = mesh2.GetVertexArray()
