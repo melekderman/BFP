@@ -2,7 +2,7 @@
 
 [![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/test.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml)
+[![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml)
 
 This package offers a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with [PyMFEM](https://github.com/mfem/PyMFEM) and [pyglvis](https://github.com/GLVis/pyglvis). The following instructions provide guidance on installation, running the solver, and testing.
 
