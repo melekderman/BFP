@@ -49,8 +49,7 @@ class CustomInstallCommand(install):
         # PyMFEM
         pymfem_dir = os.path.join(cwd, "PyMFEM")
         if os.path.exists(pymfem_dir):
-            print("Removing existing PyMFEM directory...")
-            shutil.rmtree(pymfem_dir)
+            print("PyMFEM directory already exists. Skipping clone...")
 
         print("Cloning PyMFEM repository...")
         subprocess.check_call(["git", "clone", "https://github.com/melekderman/PyMFEM.git", pymfem_dir])
@@ -58,10 +57,10 @@ class CustomInstallCommand(install):
         os.chdir(pymfem_dir)
         try:
             if PARALLEL:
-                print("Installing PyMFEM with parallel support...")
+                print("Installing PyMFEM (parallel mode)...")
                 subprocess.check_call([sys.executable, "setup.py", "install", "--with-parallel"])
             else:
-                print("Installing PyMFEM (standard mode)...")
+                print("Installing PyMFEM (serial mode)...")
                 subprocess.check_call([sys.executable, "setup.py", "install"])
         except subprocess.CalledProcessError as e:
             print("PyMFEM installation failed:", e)
@@ -72,10 +71,9 @@ class CustomInstallCommand(install):
             shutil.rmtree(pymfem_dir)
 
         # PyGLVis
-        pyglvis_dir = os.path.join(cwd, "pyglvis")
+        pyglvis_dir = os.path.join(cwd, "PyGLVis")
         if os.path.exists(pyglvis_dir):
-            print("Removing existing pyglvis directory...")
-            shutil.rmtree(pyglvis_dir)
+            print("PyGLVis directory already exists. Skipping clone...")
 
         print("Cloning pyglvis repository...")
         subprocess.check_call(["git", "clone", "https://github.com/melekderman/pyglvis.git", pyglvis_dir])
@@ -100,7 +98,7 @@ setup(
     version="0.0.1",
     packages=find_packages(),
     include_package_data=True,
-    description="BFP: A Boltzmann Fokker-Planck Charged Particle Transport Solver integrating with PyMFEM",
+    description="BFP: A Boltzmann Fokker-Planck charged particle transport solver integrating with PyMFEM",
     long_description=open("README.md", encoding="utf-8").read() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
     install_requires=[
