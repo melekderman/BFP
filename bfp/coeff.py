@@ -67,7 +67,6 @@ class TotalXSCoefficient(mfem.PyCoefficient):
                     int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
         return float(self.xs_t_data[group])
 
-
 class ScatteringXSCoefficient(mfem.PyCoefficient):
     """Coefficient for the scattering cross-section Σ_s(E).
 
@@ -320,7 +319,6 @@ class QCoefficient(mfem.PyCoefficient):
         group = min(n_groups - 1, int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
         return float(self.Q_data[group])
 
-
 class EnergyDependentCoefficient(mfem.PyCoefficient):
     """Energy-dependent coefficient using either a constant or a one-dimensional array.
 
@@ -421,7 +419,6 @@ class XDependentCoefficient(mfem.PyCoefficient):
         group = min(n_groups - 1, int((x_val - self.x_start) / (self.x_end - self.x_start) * n_groups))
         return float(self.data[group])
 
-
 class VelocityCoefficientOld(mfem.VectorPyCoefficientBase):
     """Velocity vector coefficient for the transport equation.
 
@@ -446,7 +443,6 @@ class VelocityCoefficientOld(mfem.VectorPyCoefficientBase):
             ip (IntegrationPoint): Integration point where the evaluation occurs.
         """
         return [self.mu, self.S_coeff(ip)]
-
 
 class VelocityCoefficient(mfem.VectorPyCoefficient):
     """
@@ -477,7 +473,6 @@ class VelocityCoefficient(mfem.VectorPyCoefficient):
         comp1 = self.S_arr[idx]
         
         return [comp0, comp1]
-    
 
 class ConstantCoefficient(mfem.PyCoefficient):
     def __init__(self, const):
@@ -485,6 +480,3 @@ class ConstantCoefficient(mfem.PyCoefficient):
         self.const = const
     def EvalValue(self, x):
         return self.const
-    
-
-    

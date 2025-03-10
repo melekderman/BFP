@@ -8,18 +8,21 @@ solvers, and visualization.
 __version__ = "0.0.1"
 
 from .mesh import create_2D_mesh, create_3D_mesh
-from .utils import read_data, gauss_legendre_dirs, compute_S_derivative
+from .utils import read_data, gauss_legendre_dirs, compute_S_derivative, gridfunction_to_array, assign_boundary_attributes, get_marker_for_mu
 from .coeff import (
     TotalXSCoefficient,
     ScatteringXSCoefficient,
     StoppingPowerCoefficient,
     StoppingPowerDerivativeCoefficient,
-    InflowCoefficient,
+    InflowCoefficientSN,
     QCoefficient,
     EnergyDependentCoefficient,
-    VelocityCoefficient
+    XDependentCoefficient,
+    VelocityCoefficientOld,
+    VelocityCoefficient,
+    ConstantCoefficient
 )
-from .vis import glvis_visualize, matplotlib_visualize, mesh_report
+from .vis import glvis_visualize, matplotlib_visualize, mesh_report, HeatmapPlot, ScatterPlot
 
 __all__ = [
     # mesh.py
@@ -30,19 +33,27 @@ __all__ = [
     'read_data',
     'gauss_legendre_dirs',
     'compute_S_derivative',
+    'gridfunction_to_array',
+    'assign_boundary_attributes',
+    'get_marker_for_mu',
 
     # coeff.py
     'TotalXSCoefficient',
     'ScatteringXSCoefficient',
     'StoppingPowerCoefficient',
     'StoppingPowerDerivativeCoefficient',
-    'InflowCoefficient',
+    'InflowCoefficientSN',
     'QCoefficient',
     'EnergyDependentCoefficient',
+    'XDependentCoefficient',
+    'VelocityCoefficientOld',
     'VelocityCoefficient',
+    'ConstantCoefficient',
 
     # vis.py
     'glvis_visualize',
     'matplotlib_visualize',
     'mesh_report',
+    'HeatmapPlot',
+    'ScatterPlot'
 ]
