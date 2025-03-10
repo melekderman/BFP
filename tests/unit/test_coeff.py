@@ -19,8 +19,9 @@ class TestCoefficients(unittest.TestCase):
     def test_TotalXSCoefficient(self):
         xs_t_data = [1.0, 2.0, 3.0]
         coeff = TotalXSCoefficient(xs_t_data, 0.0, 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.5]), 2.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.9]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0, 0.9]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0, 1.1]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0, 2.5]), 3.0)
 
     def test_ScatteringXSCoefficient(self):
         xs_s_data = [0.5, 1.5, 2.5]
