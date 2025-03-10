@@ -8,7 +8,8 @@ __all__ = [
     'compute_S_derivative',
     'gridfunction_to_array',
     'assign_boundary_attributes',
-    'get_marker_for_mu']
+    'get_marker_for_mu'
+    ]
 
 def read_data(nE):
     """Read cross-section and stopping power data from an HDF5 file.

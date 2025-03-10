@@ -5,10 +5,13 @@ from bfp.coeff import (
     ScatteringXSCoefficient,
     StoppingPowerCoefficient,
     StoppingPowerDerivativeCoefficient,
-    InflowCoefficient,
+    InflowCoefficientSN,
     QCoefficient,
     EnergyDependentCoefficient,
-    VelocityCoefficient
+    XDependentCoefficient,
+    VelocityCoefficientOld,
+    VelocityCoefficient,
+    ConstantCoefficient
 )
 
 class IntegrationPointMock:
@@ -44,10 +47,15 @@ class TestCoefficients(unittest.TestCase):
         self.assertAlmostEqual(coeff.EvalValue([0, 0]), -1)
         self.assertAlmostEqual(coeff.EvalValue([0, 1]), -3)
 
-    def test_InflowCoefficient(self):
-        coeff = InflowCoefficient(5.0)
+    def test_InflowCoefficientSN_positive_mu(self):
+        coeff = InflowCoefficientSN(in_flux=5.0, mu=0.7)
         self.assertEqual(coeff.EvalValue([0, 0]), 5.0)
         self.assertEqual(coeff.EvalValue([10, 100]), 5.0)
+
+    def test_InflowCoefficientSN_negative_mu(self):
+        coeff = InflowCoefficientSN(in_flux=5.0, mu=-0.7)
+        self.assertEqual(coeff.EvalValue([0, 0]), 0.0)
+        self.assertEqual(coeff.EvalValue([10, 100]), 0.0)
 
     def test_QCoefficient_constant(self):
         coeff = QCoefficient(7.0)
@@ -65,23 +73,32 @@ class TestCoefficients(unittest.TestCase):
         self.assertAlmostEqual(coeff.EvalValue([0, 0]), 10.0)
         self.assertAlmostEqual(coeff.EvalValue([0, 1]), 30.0)
 
+    def test_XDependentCoefficient(self):
+        data = [1.0, 3.0, 5.0]
+        coeff = XDependentCoefficient(data, 0.0, 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([1.5, 0]), 3.0)
+
+    def test_VelocityCoefficientOld(self):
+        mu = 0.5
+        S_coeff = ConstantCoefficient(2.0)
+        coeff = VelocityCoefficientOld(mu, S_coeff)
+        self.assertEqual(coeff._EvalPy([0, 0]), [0.5, 2.0])
+        self.assertEqual(coeff._EvalPy([1, 1]), [0.5, 2.0])
+
     def test_VelocityCoefficient(self):
-        class MockIP:
-            x = 0
-            y = 0.5
+        mu = 0.8
+        S_arr = [1.0, 2.0, 3.0]
+        E_start, E_end = 0.0, 3.0
+        coeff = VelocityCoefficient(mu, S_arr, E_start, E_end)
+        self.assertEqual(coeff.EvalValue([0, 0]), [0.8, 1.0])
+        self.assertEqual(coeff.EvalValue([0, 1]), [0.8, 3.0])
 
-            def __getitem__(self, idx):
-                return [0, self.y][idx]
-
-        mu = 1.0
-        S_data = [2.0, 4.0]
-        s_coeff = StoppingPowerCoefficient(S_data, 0.0, 2.0)
-        coeff = VelocityCoefficient(mu, s_coeff)
-
-        V = np.zeros(2)
-        coeff._EvalPy(V, [0, 0.5])
-        self.assertAlmostEqual(V[0], mu)
-        self.assertAlmostEqual(V[1], 4.0)
+    def test_ConstantCoefficient(self):
+        const_value = 7.0
+        coeff = ConstantCoefficient(const_value)
+        self.assertEqual(coeff.EvalValue([0, 0.5]), 7.0)
+        self.assertEqual(coeff.EvalValue([10, 100]), 7.0)
 
 if __name__ == '__main__':
     unittest.main()
