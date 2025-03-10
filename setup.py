@@ -41,6 +41,8 @@ class CustomInstallCommand(install):
             "ipywidgets>=8.0.0",
             "requests",
             "h5py",
+            "seaborn",
+            "pandas"
         ]
 
         print("Installing dependencies...")
@@ -113,6 +115,8 @@ setup(
     "ipywidgets>=8.0.0",
     "requests",
     "h5py",
+    "seaborn"
+    "pandas",
 ],
     author="Melek Derman",
     author_email="dermanm@oregonstate.edu",
