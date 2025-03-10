@@ -20,6 +20,7 @@ from .coeff import (
     XDependentCoefficient,
     VelocityCoefficientOld,
     VelocityCoefficient,
+    VelocityCoefficient2,
     ConstantCoefficient
 )
 from .vis import glvis_visualize, matplotlib_visualize, mesh_report, HeatmapPlot, ScatterPlot
@@ -48,6 +49,7 @@ __all__ = [
     'XDependentCoefficient',
     'VelocityCoefficientOld',
     'VelocityCoefficient',
+    'VelocityCoefficient2',
     'ConstantCoefficient',
 
     # vis.py

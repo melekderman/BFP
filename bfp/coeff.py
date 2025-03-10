@@ -13,6 +13,7 @@ __all__ = [
     'XDependentCoefficient',
     'VelocityCoefficientOld',
     'VelocityCoefficient',
+    'VelocityCoefficient2',
     'ConstantCoefficient'
     ]
 
@@ -473,6 +474,31 @@ class VelocityCoefficient(mfem.VectorPyCoefficient):
         comp1 = self.S_arr[idx]
         
         return [comp0, comp1]
+    
+class VelocityCoefficient2(mfem.VectorPyCoefficientBase):
+    """Velocity vector coefficient for the transport equation.
+
+    Defines a velocity vector:
+        v(x) = [μ, S(E)]
+
+    Attributes:
+        mu (float): Scalar value, e.g., discrete ordinate.
+        S_coef (Coefficient): Coefficient object used to evaluate S(E) at given points.
+    """
+
+    def __init__(self, mu, S_coeff):
+        mfem.VectorPyCoefficientBase.__init__(self, 2, 0)
+        self.mu = mu
+        self.S_coeff = S_coeff
+
+    def _EvalPy(self, V, ip):
+        """Evaluates the velocity vector at a given integration point.
+
+        Args:
+            V (array_like): Output vector of size 2 to store the velocity.
+            ip (IntegrationPoint): Integration point where the evaluation occurs.
+        """
+        return [self.mu, self.S_coeff]
 
 class ConstantCoefficient(mfem.PyCoefficient):
     def __init__(self, const):

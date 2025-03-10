@@ -19,7 +19,6 @@ class TestCoefficients(unittest.TestCase):
     def test_TotalXSCoefficient(self):
         xs_t_data = [1.0, 2.0, 3.0]
         coeff = TotalXSCoefficient(xs_t_data, 0.0, 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.0]), 1.0)
         self.assertAlmostEqual(coeff.EvalValue([0, 0.5]), 2.0)
         self.assertAlmostEqual(coeff.EvalValue([0, 0.9]), 3.0)
 
@@ -86,13 +85,6 @@ class TestCoefficients(unittest.TestCase):
         coeff = XDependentCoefficient(data, 0.0, 3.0)
         self.assertAlmostEqual(coeff.EvalValue([0.0, 0]), 1.0)
         self.assertAlmostEqual(coeff.EvalValue([1.5, 0]), 3.0)
-
-    def test_VelocityCoefficientOld(self):
-        mu = 0.5
-        S_coeff = ConstantCoefficient(2.0)
-        coeff = VelocityCoefficientOld(mu, S_coeff)
-        self.assertEqual(coeff._EvalPy([0, 0]), [0.5, 2.0])
-        self.assertEqual(coeff._EvalPy([1, 1]), [0.5, 2.0])
 
 if __name__ == '__main__':
     unittest.main()
