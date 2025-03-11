@@ -61,7 +61,7 @@ class TotalXSCoefficient(mfem.PyCoefficient):
         if self.constant:
             return self.constant_value
 
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1]
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.xs_t_data)
         group = min(n_groups - 1,
@@ -112,7 +112,7 @@ class ScatteringXSCoefficient(mfem.PyCoefficient):
         if self.constant:
             return self.constant_value
 
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1] 
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.xs_s_data)
         group = min(n_groups - 1,
@@ -162,7 +162,7 @@ class StoppingPowerCoefficient(mfem.PyCoefficient):
         """
         if self.constant:
             return self.constant_value
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1] 
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.S_data)
         group = min(n_groups - 1,
@@ -212,7 +212,7 @@ class StoppingPowerDerivativeCoefficient(mfem.PyCoefficient):
         """
         if self.constant:
             return self.constant_value
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1] 
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.dS_data)
         group = min(n_groups - 1,
@@ -314,7 +314,7 @@ class QCoefficient(mfem.PyCoefficient):
         if self.constant:
             return self.constant_value
 
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1] 
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.Q_data)
         group = min(n_groups - 1, int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
@@ -364,7 +364,7 @@ class EnergyDependentCoefficient(mfem.PyCoefficient):
         if self.constant:
             return self.constant_value
 
-        y = (ip[1] - self.E_start) / (self.E_end - self.E_start)
+        y = ip[1] 
         E = self.E_start + y * (self.E_end - self.E_start)
         n_groups = len(self.data)
         group = min(n_groups - 1, int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
@@ -414,7 +414,7 @@ class XDependentCoefficient(mfem.PyCoefficient):
         if self.constant:
             return self.constant_value
 
-        y = (ip[0] - self.x_start) / (self.x_end - self.x_start)
+        y = ip[0] 
         x_val = self.x_start + y * (self.x_end - self.x_start)
         n_groups = len(self.data)
         group = min(n_groups - 1, int((x_val - self.x_start) / (self.x_end - self.x_start) * n_groups))
