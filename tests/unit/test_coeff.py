@@ -124,12 +124,12 @@ class TestCoefficients(unittest.TestCase):
 
     def test_XDependentCoefficient_constant(self):
         coeff = XDependentCoefficient(40, 1, 0.01)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.0]), 0.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.208, 0.0]), 1.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.406, 0.0]), 2.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.604, 0.0]), 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.802, 0.0]), 4.0)
-        self.assertAlmostEqual(coeff.EvalValue([1.0, 0.0]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.208, 0.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.406, 0.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.604, 0.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.802, 0.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([1.0, 0.0]), 40.0)
 
     # Test the ConstantCoefficient class.
     def test_ConstantCoefficient(self):
