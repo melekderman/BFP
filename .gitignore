@@ -35,11 +35,9 @@
 PyMFEM/
 pyglvis/
 BFP.egg-info/
-build/bdist.macosx-11.1-arm64
-eg/
 bfp/mesh/usr/
-examples1/
 bfp/__all__.py
+tests/unit/mesh/
 
 # Cache folder
 bfp/__pycache__/

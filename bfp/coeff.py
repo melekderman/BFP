@@ -1,508 +1,485 @@
 """Module for coefficients"""
 
 import mfem.ser as mfem
+import numpy as np
 
 __all__ = [
-    'TotalXSCoefficient',
-    'ScatteringXSCoefficient',
-    'StoppingPowerCoefficient',
-    'StoppingPowerDerivativeCoefficient',
-    'InflowCoefficientSN',
-    'QCoefficient',
-    'EnergyDependentCoefficient',
+    'TotalXSCoefficientE',
+    'ScatteringXSCoefficientE',
+    'StoppingPowerCoefficientE',
+    'QCoefficientE',
+    'EDependentCoefficient',
     'XDependentCoefficient',
-    'VelocityCoefficientOld',
-    'VelocityCoefficient',
-    'VelocityCoefficient2',
-    'ConstantCoefficient'
+    'InflowCoefficient',
+    'ConstantCoefficient',
+    'VectorConstCoefficient',
     ]
 
-class TotalXSCoefficient(mfem.PyCoefficient):
-    """Coefficient for the total cross-section Σ_t(E).
+class TotalXSCoefficientE(mfem.PyCoefficient):
+    """Coefficient class for the total macroscopic cross-section Σ_t(E). 
+    (This coefficient will be updated for Σ_t(x,E))
 
-    This coefficient maps the normalized energy coordinate (x[1]) in [0, 1] to the
-    corresponding total cross-section value. Specifically, a value of y = 0 corresponds to
-    E = E_start and y = 1 corresponds to E = E_end. If a constant is provided 
-    (e.g., 1), the coefficient returns this constant at all points.
+    This class provides a piecewise-constant coefficient function based on energy groups.
+    The energy range is defined from E_start (higher energy) to E_end (lower energy),
+    with energy values sorted in descending order. The corresponding total cross-section
+    values in xs_t_data are also arranged from higher to lower energy. This ordering is based
+    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
+    loss of charged particles is treated as a continuous process, naturally leading to a descending
+    energy order.
+
+    Attributes:
+        E_start (float): Upper bound of the energy range.
+        E_end (float): Lower bound of the energy range.
+        xs_t_data (array-like or float): Total cross-section values per energy group,
+            or a constant value.
+
+    Args:
+        xs_t_data (float or list of float): Total cross-section data (constant or group-based).
+        E_start (float): Start energy for energy group mapping.
+        E_end (float): End energy for energy group mapping.
 
     Examples:
-        TotalXSCoefficient(1)
-            # Always returns 1.
+        Constant cross-section:
+            TotalXSCoefficientE(1.0, E_start=1.0, E_end=0.01)
 
-        TotalXSCoefficient(xs_t_data, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from xs_t_data.
+        Energy-dependent cross-section:
+            TotalXSCoefficientE(xs_t_data, E_start=1.0, E_end=0.01)
     """
 
-    def __init__(self, xs_t_data, E_start=None, E_end=None):
-        super(TotalXSCoefficient, self).__init__()
+    def __init__(self, xs_t_data, E_start, E_end):
+        super(TotalXSCoefficientE, self).__init__()
+        self.E_start = E_start
+        self.E_end = E_end
         if isinstance(xs_t_data, (int, float)):
             self.constant = True
             self.constant_value = float(xs_t_data)
         else:
             self.constant = False
             self.xs_t_data = xs_t_data
-            self.E_start = E_start
-            self.E_end = E_end
+            self.n_groups = len(xs_t_data)
+            self.E_bins = np.linspace(E_start, E_end, self.n_groups + 1)
 
-    def EvalValue(self,ip):
-        """Evaluates the total cross-section at a given energy coordinate.
-
-        This method converts the normalized energy coordinate found in x[1] to the actual 
-        energy value and determines the corresponding energy group to return the associated 
-        total cross-section value. 
+    def EvalValue(self, x):
+        """Evaluate the total cross-section at the given energy point.
 
         Args:
-        ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                (in the range [0, 1]).
+            x (list or array-like): Input point, where x[1] is the energy value.
 
         Returns:
-            float: The total cross-section value corresponding to the computed energy.
+            float: Corresponding total cross-section value.
         """
         if self.constant:
             return self.constant_value
+        E = x[1]
+        for i in range(self.n_groups - 1):
+            if np.isclose(E, self.E_bins[i+1]):
+                return float(self.xs_t_data[i+1])
+            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+                return float(self.xs_t_data[i])
+        return float(self.xs_t_data[-1])
 
-        y = ip[1]
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.xs_t_data)
-        group = min(n_groups - 1,
-                    int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.xs_t_data[group])
 
-class ScatteringXSCoefficient(mfem.PyCoefficient):
-    """Coefficient for the scattering cross-section Σ_s(E).
+class ScatteringXSCoefficientE(mfem.PyCoefficient):
+    """Coefficient class for the scattering cross-section Σ_s(E).
+    (This coefficient will be updated for Σ_s(x,E))
 
-    This coefficient maps the normalized energy coordinate (x[1]) in [0, 1] to the
-    corresponding cross-section value. Specifically, a value of y = 0 corresponds to
-    E = E_start and y = 1 corresponds to E = E_end. If a constant is provided 
-    (e.g., 1), the coefficient returns this constant at all points.
+    This class provides a piecewise-constant coefficient function based on energy groups.
+    The energy range is defined from E_start (higher energy) to E_end (lower energy),
+    with energy values sorted in descending order. The corresponding scattering cross-section
+    values in xs_s_data are also arranged from higher to lower energy. This ordering is based
+    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
+    loss of charged particles is treated as a continuous process, naturally leading to a descending
+    energy order.
+
+    Attributes:
+        E_start (float): Upper bound of the energy range.
+        E_end (float): Lower bound of the energy range.
+        xs_s_data (array-like or float): Scattering cross-section values per energy group,
+            or a constant value.
+
+    Args:
+        xs_s_data (float or list of float): Scattering cross-section data (constant or group-based).
+        E_start (float): Start energy for energy group mapping.
+        E_end (float): End energy for energy group mapping.
 
     Examples:
-        ScatteringXSCoefficient(1)
-            # Always returns 1.
+        Constant cross-section:
+            ScatteringXSCoefficientE(1.0, E_start=1.0, E_end=0.01)
 
-        ScatteringXSCoefficient(xs_s_data, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from xs_s_data.
+        Energy-dependent cross-section:
+            ScatteringXSCoefficientE(xs_s_data, E_start=1.0, E_end=0.01)
     """
 
-    def __init__(self, xs_s_data, E_start=None, E_end=None):
-        super(ScatteringXSCoefficient, self).__init__()
+    def __init__(self, xs_s_data, E_start, E_end):
+        super(ScatteringXSCoefficientE, self).__init__()
+        self.E_start = E_start
+        self.E_end = E_end
         if isinstance(xs_s_data, (int, float)):
             self.constant = True
             self.constant_value = float(xs_s_data)
         else:
             self.constant = False
             self.xs_s_data = xs_s_data
-            self.E_start = E_start
-            self.E_end = E_end
+            self.n_groups = len(xs_s_data)
+            self.E_bins = np.linspace(E_start, E_end, self.n_groups + 1)
 
-    def EvalValue(self, ip):
-        """Evaluates the scattering cross-section at a given normalized energy coordinate.
-
-        This method converts the normalized energy coordinate found in x[1] to the actual 
-        energy value and determines the corresponding energy group to return the associated 
-        scattering cross-section value. 
+    def EvalValue(self, x):
+        """Evaluate the scattering cross-section at the given energy point.
 
         Args:
-            ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                in the range [0, 1].
+            x (list or array-like): Input point, where x[1] is the energy value.
 
         Returns:
-            float: The scattering cross-section value for the computed energy.
+            float: Corresponding scattering cross-section value.
         """
         if self.constant:
             return self.constant_value
+        E = x[1]
+        for i in range(self.n_groups - 1):
+            if np.isclose(E, self.E_bins[i+1]):
+                return float(self.xs_s_data[i+1])
+            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+                return float(self.xs_s_data[i])
+        return float(self.xs_s_data[-1])
 
-        y = ip[1] 
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.xs_s_data)
-        group = min(n_groups - 1,
-                    int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.xs_s_data[group])
 
-class StoppingPowerCoefficient(mfem.PyCoefficient):
-    """Coefficient for the stopping power S(E).
+class StoppingPowerCoefficientE(mfem.PyCoefficient):
+    """Coefficient class for the stopping power S(E).
+    (This coefficient will be updated for S(x,E))
 
-    This coefficient maps the normalized energy coordinate (ip[1]) in the interval [0, 1]
-    to the corresponding stopping power S(E). Specifically, a value of y = 0 corresponds to 
-    E = E_start, and a value of y = 1 corresponds to E = E_end. If a constant is provided 
-    (e.g., 1), the coefficient returns this constant at all points.
+    This class provides a piecewise-constant coefficient function based on energy groups.
+    The energy range is defined from E_start (higher energy) to E_end (lower energy),
+    with energy values sorted in descending order. The corresponding stopping power
+    values in S_data are also arranged from higher to lower energy. This ordering is based
+    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
+    loss of charged particles is treated as a continuous process, naturally leading to a descending
+    energy order.
+
+    Attributes:
+        E_start (float): Upper bound of the energy range.
+        E_end (float): Lower bound of the energy range.
+        S_data (array-like or float): Stopping power values per energy group,
+            or a constant value.
+
+    Args:
+        S_data (float or list of float): Stopping power data (constant or group-based).
+        E_start (float): Start energy for energy group mapping.
+        E_end (float): End energy for energy group mapping.
 
     Examples:
-        StoppingPowerCoefficient(1)
-            # Always returns 1.
+        Constant stopping power:
+            StoppingPowerCoefficientE(1.0, E_start=1.0, E_end=0.01)
 
-        StoppingPowerCoefficient(S_data, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from S_data.
+        Energy-dependent stopping power:
+            StoppingPowerCoefficientE(S_data, E_start=1.0, E_end=0.01)
     """
-
-    def __init__(self, S_data, E_start=None, E_end=None):
-        super(StoppingPowerCoefficient, self).__init__()
+    def __init__(self, S_data, E_start, E_end):
+        super(StoppingPowerCoefficientE, self).__init__()
+        self.E_start = E_start
+        self.E_end = E_end
         if isinstance(S_data, (int, float)):
             self.constant = True
             self.constant_value = float(S_data)
         else:
             self.constant = False
             self.S_data = S_data
-            self.E_start = E_start
-            self.E_end = E_end
+            self.n_groups = len(S_data)
+            self.E_bins = np.linspace(E_start, E_end, self.n_groups + 1)
 
-    def EvalValue(self, ip):
-        """Evaluates the stopping power at a given normalized energy coordinate.
-
-        This method converts the normalized energy coordinate found in ip[1] to the actual 
-        energy value and determines the corresponding energy group to return the associated 
-        stopping power value. 
+    def EvalValue(self, x):
+        """Evaluate the stopping power at the given energy point.
 
         Args:
-            ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                (in the range [0, 1]).
+            x (list or array-like): Input point, where x[1] is the energy value.
 
         Returns:
-            float: The stopping power value corresponding to the computed energy.
+            float: Corresponding stopping power value.
         """
         if self.constant:
             return self.constant_value
-        y = ip[1] 
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.S_data)
-        group = min(n_groups - 1,
-                    int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.S_data[group])
+        E = x[1]
+        for i in range(self.n_groups - 1):
+            if np.isclose(E, self.E_bins[i+1]):
+                return float(self.S_data[i+1])
+            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+                return float(self.S_data[i])
+        return float(self.S_data[-1])
 
-class StoppingPowerDerivativeCoefficient(mfem.PyCoefficient):
-    """Coefficient for the derivative of the stopping power S(E), i.e., S'(E).
 
-    This coefficient maps the normalized energy coordinate (x[1]) in the interval [0, 1]
-    to the corresponding derivative of the stopping power S(E). A value of y = 0 corresponds 
-    to E = E_start and y = 1 corresponds to E = E_end. If a constant is provided 
-    (e.g., 1), the coefficient returns this constant at all points.
+class QCoefficientE(mfem.PyCoefficient):
+    """Coefficient class for the energy-dependent source term Q(E). 
+    (This coefficient will be updated for Q(x,E))
 
-    Examples:
-        StoppingPowerDerivativeCoefficient(1)
-            # Always returns 1.
+    This class provides a piecewise-constant coefficient function based on energy groups.
+    The energy range is defined from E_start (higher energy) to E_end (lower energy),
+    with energy values sorted in descending order. The corresponding source term values
+    in Q_data are also arranged from higher to lower energy. This ordering is based on the
+    logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy loss
+    of charged particles is treated as a continuous process, naturally leading to a descending
+    energy order.
 
-        StoppingPowerDerivativeCoefficient(dS_data, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from data_array.
-    """
-
-    def __init__(self, dS_data, E_start=None, E_end=None):
-        super(StoppingPowerDerivativeCoefficient, self).__init__()
-        if isinstance(dS_data, (int, float)):
-            self.constant = True
-            self.constant_value = float(dS_data)
-        else:
-            self.constant = False
-            self.dS_data = dS_data
-            self.E_start = E_start
-            self.E_end = E_end
-
-    def EvalValue(self, ip):
-        """Evaluates the derivative of the stopping power at a given normalized energy coordinate.
-
-        This method converts the normalized energy coordinate found in ip[1] to the actual 
-        energy value and determines the corresponding energy group to return the associated 
-        derivative of the stopping power value. 
-
-        Args:
-            ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                (in the range [0, 1]).
-
-        Returns:
-            float: The derivative of the stopping power corresponding to the computed energy.
-        """
-        if self.constant:
-            return self.constant_value
-        y = ip[1] 
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.dS_data)
-        group = min(n_groups - 1,
-                    int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.dS_data[group])
-
-class InflowCoefficientSN(mfem.PyCoefficient):
-    """Coefficient for an inflow boundary condition in (x,E) space with SN angular dependence.
-
-    This class returns an inflow flux value that depends on the discrete ordinate
-    (angular) parameter \(\mu\). On the left boundary:
-      - If \(\mu > 0\), the inflow flux is applied (e.g., set to a prescribed value).
-      - If \(\mu < 0\), the incoming flux is zero.
-    
-    This is useful in SN (discrete ordinates) methods where the transport equation is
-    solved separately for each angular direction.
-    
     Attributes:
-        in_flux (float): The constant inflow flux value to be used when \(\mu > 0\).
-        mu (float): The discrete ordinate (angular direction) for which this coefficient is used.
-    """
+        E_start (float): Higher energy bound of the energy range.
+        E_end (float): Lower energy bound of the energy range.
+        Q_data (array-like or float): Energy-dependent source term values per energy group,
+            or a constant value.
 
-    def __init__(self, in_flux, mu):
-        """Initializes the SN inflow coefficient.
-        
-        Args:
-            in_flux (float): The constant inflow flux value for \(\mu > 0\).
-            mu (float): The discrete angular direction value.
-        """
-        super(InflowCoefficientSN, self).__init__()
-        self.in_flux = in_flux
-        self.mu = mu
-
-    def EvalValue(self, ip):
-        """Evaluates the inflow coefficient at a given integration point.
-        
-        In this implementation, the integration point is interpreted in (x,E) space.
-        The angular parameter \(\mu\) is stored in the class. The function returns
-        the prescribed inflow flux if \(\mu > 0\) and zero otherwise.
-        
-        Args:
-            ip (mfem.IntegrationPoint or list[float]): The integration point coordinates,
-                where ip[0] is the spatial coordinate \(x\) and ip[1] is the energy \(E\).
-                The angular information is not included in ip.
-        
-        Returns:
-            float: The inflow flux value if \(\mu > 0\); otherwise, 0.0.
-        """
-        # Since the integration point ip does not include the angular variable,
-        # we use the stored self.mu to determine the flux.
-        if self.mu > 0:
-            return self.in_flux
-        else:
-            return 0.0
-
-class QCoefficient(mfem.PyCoefficient):
-    """Coefficient for the energy dependent source term Q(E). ((will be updated for Q(x,E)))
-
-    This coefficient maps the normalized energy coordinate (ip[1]) in the interval [0, 1]
-    to the corresponding the energy dependent source Q(E). Specifically, a value of y = 0 
-    corresponds to E = E_start, and a value of y = 1 corresponds to E = E_end. If a constant 
-    is provided 
-    (e.g., 1), the coefficient returns this constant at all points.
+    Args:
+        Q_data (float or list of float): Source term data (constant or group-based).
+        E_start (float): Start energy for energy group mapping (higher energy).
+        E_end (float): End energy for energy group mapping (lower energy).
 
     Examples:
-        StoppingPowerCoefficient(1)
-            # Always returns 1.
+        Constant source term:
+            QCoefficient(1.0, E_start=1.0, E_end=0.01)
 
-        StoppingPowerCoefficient(S_data, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from S_data.
+        Energy-dependent source term:
+            QCoefficient(Q_data, E_start=1.0, E_end=0.01)
     """
-    def __init__(self, Q_data, E_start=None, E_end=None):
-        super(QCoefficient, self).__init__()
+    def __init__(self, Q_data, E_start, E_end):
+        super(QCoefficientE, self).__init__()
+        self.E_start = E_start
+        self.E_end = E_end
         if isinstance(Q_data, (int, float)):
             self.constant = True
             self.constant_value = float(Q_data)
         else:
             self.constant = False
             self.Q_data = Q_data
-            self.E_start = E_start
-            self.E_end = E_end
-
-    def EvalValue(self, ip):
-        """Evaluates the energy dependent source term Q(E) at a given normalized energy coordinate.
-
-        For non-constant Q_data, this method converts the normalized energy coordinate ip[1] to the 
-        corresponding energy value and returns the Q value for the associated energy group. 
-        If Q_data is constant, it always 
-        returns this constant value.
-
-        Args:
-            ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                (in the range [0, 1]).
-
-        Returns:
-            float: The energy dependent source value corresponding to the computed energy.
-        """
-
-        if self.constant:
-            return self.constant_value
-
-        y = ip[1] 
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.Q_data)
-        group = min(n_groups - 1, int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.Q_data[group])
-
-class EnergyDependentCoefficient(mfem.PyCoefficient):
-    """Energy-dependent coefficient using either a constant or a one-dimensional array.
-
-    This coefficient maps a normalized energy coordinate (ip[1] in [0, 1])
-    to a value by linearly interpolating data over an interval defined by E_start and E_end.
-    If a constant is provided (e.g., 1), it is converted to an array (with two points)
-    and then processed identically to an array input.
-
-    Examples:
-        EnergyDependentCoefficient(1)
-            # Always returns 1.
-
-        EnergyDependentCoefficient(data_array, E_start=0.0, E_end=1.0)
-            # Returns the interpolated value from data_array.
-    """
-
-    def __init__(self, data, E_start=None, E_end=None):
-        super(EnergyDependentCoefficient, self).__init__()
-        if isinstance(data, (int, float)):
-            self.constant = True
-            self.constant_value = float(data)
-        else:
-            self.constant = False
-            self.data = data
-            self.E_start = E_start
-            self.E_end = E_end
-
-    def EvalValue(self,ip):
-        """Evaluates the coefficient at a given normalized energy coordinate.
-
-        This method converts the normalized energy coordinate (ip[1]) to a physical energy
-        value, determines the corresponding index (group) in the data array via linear 
-        interpolation, and returns the associated coefficient value.
-
-        Args:
-            ip (list or array-like): A coordinate array where ip[1] is the normalized energy 
-                (in the range [0, 1]).
-
-        Returns:
-            float: The interpolated coefficient value corresponding to the computed energy.
-        """
-        if self.constant:
-            return self.constant_value
-
-        y = ip[1] 
-        E = self.E_start + y * (self.E_end - self.E_start)
-        n_groups = len(self.data)
-        group = min(n_groups - 1, int((E - self.E_start) / (self.E_end - self.E_start) * n_groups))
-        return float(self.data[group])
-    
-class XDependentCoefficient(mfem.PyCoefficient):
-    """X-dependent coefficient using either a constant or a one-dimensional array.
-
-    This coefficient maps a normalized x coordinate (ip[0] in [0, 1])
-    to a value by linearly interpolating data over an interval defined by x_start and x_end.
-    If a constant is provided (e.g., 1), it is converted to an array (with two points)
-    and then processed identically to an array input.
-
-    Examples:
-        XDependentCoefficient(1)
-            # Always returns 1.
-
-        XDependentCoefficient(data_array, x_start=0.0, x_end=1.0)
-            # Returns the interpolated value from data_array.
-    """
-
-    def __init__(self, data, x_start=None, x_end=None):
-        super(XDependentCoefficient, self).__init__()
-        if isinstance(data, (int, float)):
-            self.constant = True
-            self.constant_value = float(data)
-        else:
-            self.constant = False
-            self.data = data
-            self.x_start = x_start
-            self.x_end = x_end
-
-    def EvalValue(self, ip):
-        """Evaluates the coefficient at a given normalized x coordinate.
-
-        This method converts the normalized x coordinate (ip[0]) to a physical x
-        value, determines the corresponding index (group) in the data array via linear 
-        interpolation, and returns the associated coefficient value.
-
-        Args:
-            ip (list or array-like): A coordinate array where ip[0] is the normalized x 
-                (in the range [0, 1]).
-
-        Returns:
-            float: The interpolated coefficient value corresponding to the computed x.
-        """
-        if self.constant:
-            return self.constant_value
-
-        y = ip[0] 
-        x_val = self.x_start + y * (self.x_end - self.x_start)
-        n_groups = len(self.data)
-        group = min(n_groups - 1, int((x_val - self.x_start) / (self.x_end - self.x_start) * n_groups))
-        return float(self.data[group])
-
-class VelocityCoefficientOld(mfem.VectorPyCoefficientBase):
-    """Velocity vector coefficient for the transport equation.
-
-    Defines a velocity vector:
-        v(x) = [μ, S(E)]
-
-    Attributes:
-        mu (float): Scalar value, e.g., discrete ordinate.
-        S_coef (Coefficient): Coefficient object used to evaluate S(E) at given points.
-    """
-
-    def __init__(self, mu, S_coeff):
-        mfem.VectorPyCoefficientBase.__init__(self, 2, 0)
-        self.mu = mu
-        self.S_coeff = S_coeff
-
-    def _EvalPy(self, ip):
-        """Evaluates the velocity vector at a given integration point.
-
-        Args:
-            V (array_like): Output vector of size 2 to store the velocity.
-            ip (IntegrationPoint): Integration point where the evaluation occurs.
-        """
-        return [self.mu, self.S_coeff(ip)]
-
-class VelocityCoefficient(mfem.VectorPyCoefficient):
-    """
-    A simple vector coefficient:
-       v(x) = [mu, S(E)]
-    that returns a Python list in EvalValue.
-    """
-    def __init__(self, mu, S_arr, E_start, E_end):
-        super(VelocityCoefficient, self).__init__(2)  # 2D vector
-        self.mu = mu
-        self.S_arr = S_arr
-        self.E_start = E_start
-        self.E_end   = E_end
+            self.n_groups = len(Q_data)
+            self.E_bins = np.linspace(E_start, E_end, self.n_groups + 1)
 
     def EvalValue(self, x):
-        """
-        x is the coordinate array, e.g. [x_coord, E_coord].
-        Returns [mu, S(E)].
-        """
-        comp0 = self.mu
-        
-        E = self.E_start + x[1]*(self.E_end - self.E_start)
-        
-        n_groups = len(self.S_arr)
-        idx = min(n_groups - 1,
-                  int((E - self.E_start)/(self.E_end - self.E_start) * n_groups))
-        
-        comp1 = self.S_arr[idx]
-        
-        return [comp0, comp1]
-    
-class VelocityCoefficient2(mfem.VectorPyCoefficientBase):
-    """Velocity vector coefficient for the transport equation.
-
-    Defines a velocity vector:
-        v(x) = [μ, S(E)]
-
-    Attributes:
-        mu (float): Scalar value, e.g., discrete ordinate.
-        S_coef (Coefficient): Coefficient object used to evaluate S(E) at given points.
-    """
-
-    def __init__(self, mu, S_coeff):
-        mfem.VectorPyCoefficientBase.__init__(self, 2, 0)
-        self.mu = mu
-        self.S_coeff = S_coeff
-
-    def _EvalPy(self, V, ip):
-        """Evaluates the velocity vector at a given integration point.
+        """Evaluate the energy-dependent source term Q(E) at the given energy point.
 
         Args:
-            V (array_like): Output vector of size 2 to store the velocity.
-            ip (IntegrationPoint): Integration point where the evaluation occurs.
+            x (list or array-like): Input point, where x[1] is the energy value.
+
+        Returns:
+            float: Corresponding source term value.
         """
-        return [self.mu, self.S_coeff]
+        if self.constant:
+            return self.constant_value
+        E = x[1]
+        for i in range(self.n_groups - 1):
+            if np.isclose(E, self.E_bins[i+1]):
+                return float(self.Q_data[i+1])
+            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+                return float(self.Q_data[i])
+        return float(self.Q_data[-1])
+
+
+class EDependentCoefficient(mfem.PyCoefficient):
+    """Coefficient class for energy-dependent values.
+
+    This class provides a piecewise-constant coefficient function based on energy groups.
+    The energy range is defined from E_start (higher energy) to E_end (lower energy),
+    with energy values sorted in descending order. The corresponding energy-dependent
+    values in data are also arranged from higher to lower energy. This ordering is based
+    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
+    loss of charged particles is treated as a continuous process, naturally leading to a descending
+    energy order.
+
+    Attributes:
+        E_start (float): Upper bound of the energy range.
+        E_end (float): Lower bound of the energy range.
+        data (array-like or float): Energy-dependent values per energy group,
+            or a constant value.
+
+    Args:
+        data (float or list of float): Energy-dependent data (constant or group-based).
+        E_start (float): Start energy for energy group mapping.
+        E_end (float): End energy for energy group mapping.
+
+    Examples:
+        Constant energy-dependent value:
+            EDependentCoefficient(1.0, E_start=1.0, E_end=0.01)
+
+        Energy-dependent coefficient:
+            EDependentCoefficient(data, E_start=1.0, E_end=0.01)
+    """
+    def __init__(self, data, E_start, E_end):
+        super(EDependentCoefficient, self).__init__()
+        self.E_start = E_start
+        self.E_end = E_end
+        if isinstance(data, (int, float)):
+            self.constant = True
+            self.constant_value = float(data)
+        else:
+            self.constant = False
+            self.data = data
+            self.n_groups = len(data)
+            self.E_bins = np.linspace(E_start, E_end, self.n_groups + 1)
+
+    def EvalValue(self, x):
+        """Evaluate the coefficient value at the given energy point.
+
+        Args:
+            x (list or array-like): Input point, where x[1] is the energy value.
+
+        Returns:
+            float: Corresponding coefficient value.
+        """
+        if self.constant:
+            return self.constant_value
+        E = x[1]
+        for i in range(self.n_groups - 1):
+            if np.isclose(E, self.E_bins[i+1]):
+                return float(self.data[i+1])
+            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+                return float(self.data[i])
+        return float(self.data[-1])
+
+
+class XDependentCoefficient(mfem.PyCoefficient):
+    """Coefficient for the spatial-dependent values.
+
+    This class provides a piecewise-constant coefficient function based on spatial cell number.
+    The spatial range is defined from x_start (lower bound) to x_end (upper bound),
+    with spatial values sorted in ascending order. The corresponding spatial-dependent
+    values in data are also arranged from lower to upper according to their grouping.
+    
+    Attributes:
+        x_start (float): Lower bound of the spatial range.
+        x_end (float): Upper bound of the spatial range.
+        data (array-like or float): Spatial-dependent values per cell, or a constant value.
+
+    Args:
+        data (float or list of float): Spatial-dependent data (constant or cell-based).
+        x_start (float): Start value for spatial mapping.
+        x_end (float): End value for spatial mapping.
+
+    Examples:
+        Constant spatial-dependent value:
+            XDependentCoefficient(1.0, x_start=0.0, x_end=10.0)
+
+        Spatial-dependent coefficient:
+            XDependentCoefficient(data, x_start=0.0, x_end=10.0)
+    """
+    def __init__(self, data, x_start, x_end):
+        super(XDependentCoefficient, self).__init__()
+        self.x_start = x_start
+        self.x_end = x_end
+        if isinstance(data, (int, float)):
+            self.constant = True
+            self.constant_value = float(data)
+        else:
+            self.constant = False
+            self.data = data
+            self.n_groups = len(data)
+            self.x_bins = np.linspace(x_start, x_end, self.n_groups + 1)
+
+    def EvalValue(self, x):
+        """Evaluate the spatial-dependent value at the given spatial point.
+
+        Args:
+            x (list or array-like): Input point, where x[0] is the spatial value.
+
+        Returns:
+            float: Corresponding spatial-dependent value.
+        """
+        if self.constant:
+            return self.constant_value
+
+        x_val = x[0]
+        for i in range(self.n_groups - 1):
+            if np.isclose(x_val, self.x_bins[i+1]):
+                return float(self.data[i+1])
+            if self.x_bins[i] <= x_val < self.x_bins[i+1]:
+                return float(self.data[i])
+        return float(self.data[-1])
+
+
+class InflowCoefficient(mfem.PyCoefficient):
+    """Coefficient class for the inflow boundary condition.
+
+    This class represents a coefficient for the inflow boundary condition.
+    The coefficient returns a specified inflow value based on the angular direction `mu` and
+    optional boundary flags. If `xl` is set to True, the coefficient returns the inflow value
+    only when `mu < 0` (left boundary). If `xr` is set to True, the coefficient returns the
+    inflow value only when `mu > 0` (right boundary). If both flags are True or if neither flag
+    is provided (default), the inflow value is returned unconditionally.
+
+    Args:
+        inflow (float): The inflow value to be used.
+        mu (float): The angular direction (e.g., cosine of the angle) used to determine if the 
+            inflow condition is met.
+        xl (bool, optional): If True, apply the inflow condition on the left boundary (when mu > 0).
+            Defaults to None.
+        xr (bool, optional): If True, apply the inflow condition on the right boundary (when mu < 0).
+            Defaults to None.
+    """
+
+    def __init__(self, inflow, mu, xl=None, xr=None):
+        super(InflowCoefficient, self).__init__()
+        self.inflow = inflow
+        self.mu = mu
+        self.xl = xl
+        self.xr = xr
+
+    def EvalValue(self, x):
+        """Evaluate the inflow coefficient.
+
+        Depending on the specified boundary flags, this method returns the inflow value only if
+        the corresponding condition based on `mu` is satisfied. If neither or both boundary flags
+        are provided, the inflow value is returned unconditionally.
+
+        Args:
+            x (list or array-like): Input point.
+
+        Returns:
+            float: The inflow value if the condition is met, otherwise 0.0.
+        """
+
+        if self.xl is True and self.xr is not True:
+            if self.mu > 0:
+                return self.inflow
+            else:
+                return 0.0 
+        
+        elif self.xr is True and self.xl is not True:
+            if self.mu < 0:
+                return self.inflow
+            else:
+                return 0.0
+
+        else:
+            return self.inflow
+
 
 class ConstantCoefficient(mfem.PyCoefficient):
+    """Coefficient that always returns a constant value.
+
+    This class represents a coefficient that returns the same constant value for any input.
+    It is useful in finite element computations where a uniform property or parameter is needed.
+
+    Args:
+        const (float): The constant value to be returned.
+    """
     def __init__(self, const):
         super(ConstantCoefficient, self).__init__()
         self.const = const
+
     def EvalValue(self, x):
         return self.const
+
+
+def VectorConstCoefficient(vel1, vel2=None, vel3=None):
+    """
+    Create and return a constant velocity vector coefficient using mfem.VectorConstantCoefficient.
+
+    This function instantiates a VectorConstCoefficient that returns a constant velocity vector.
+    The dimensionality of the vector is determined by the number of velocity values provided:
+      - 1D if only vel1 is provided.
+      - 2D if both vel1 and vel2 are provided.
+      - 3D if vel1, vel2, and vel3 are provided.
+
+    Args:
+        vel1 (float): Constant velocity value for the x-direction.
+        vel2 (float, optional): Constant velocity value for the y-direction. Defaults to None.
+        vel3 (float, optional): Constant velocity value for the z-direction. Defaults to None.
+
+    Returns:
+        VectorConstCoefficient: An instance of VectorConstCoefficient representing the constant velocity vector.
+    """
+    return mfem.VectorConstantCoefficient([vel1, vel2, vel3])

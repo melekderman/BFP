@@ -100,17 +100,17 @@ def gridfunction_to_array(phi):
     return np.array([phi[i] for i in range(phi.Size())])
 
 
-def assign_boundary_attributes(mesh, x_start, E_start, x_end, tol=1e-6):
+def assign_boundary_attributes(mesh, x_bound, E_bound, x_end, tol=1e-6):
     """
     Assigns boundary attributes to the mesh:
-      - If any vertex of a boundary element is near (x_start, E_start), assign attribute 1.
+      - If any vertex of a boundary element is near (x_bound, E_bound), assign attribute 1.
       - Else if any vertex of a boundary element is near x_end, assign attribute 2.
       - Otherwise, leave the attribute as 0.
     
     Parameters:
       mesh    : The mfem.Mesh object.
-      x_start : The x-coordinate for the left (inflow) boundary.
-      E_start : The energy coordinate for the left boundary.
+      x_bound : The x-coordinate for the left (inflow) boundary.
+      E_bound : The energy coordinate for the left boundary.
       x_end   : The x-coordinate for the right (outflow) boundary.
       tol     : Tolerance for comparing coordinates.
     """
@@ -124,7 +124,7 @@ def assign_boundary_attributes(mesh, x_start, E_start, x_end, tol=1e-6):
         for idx in v_indices:
             x_coord = vertex_array[idx][0]
             E_coord = vertex_array[idx][1]
-            if abs(x_coord - x_start) < tol and abs(E_coord - E_start) < tol:
+            if abs(x_coord - x_bound) < tol and abs(E_coord - E_bound) < tol:
                 mesh.SetBdrAttribute(i, 1)
                 break
             elif abs(x_coord - x_end) < tol:
@@ -156,3 +156,14 @@ def get_marker_for_mu(mesh, mu):
         elif mu < 0 and attr == 2:
             marker[i] = 1
     return marker
+
+
+def save_angular_flux(psi, mu):
+    """Saves the flux solution psi for a specific mu value to a file.
+
+    Args:
+        psi (mfem.GridFunction): The flux solution to save.
+        mu (float): The mu value associated with this flux solution.
+    """
+    filename = "psi_mu_{:.4f}.gf".format(mu)
+    psi.Save(filename)

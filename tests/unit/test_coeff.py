@@ -1,91 +1,143 @@
 import unittest
 import numpy as np
 from bfp.coeff import (
-    TotalXSCoefficient,
-    ScatteringXSCoefficient,
-    StoppingPowerCoefficient,
-    StoppingPowerDerivativeCoefficient,
-    InflowCoefficientSN,
-    QCoefficient,
-    EnergyDependentCoefficient,
+    TotalXSCoefficientE,
+    ScatteringXSCoefficientE,
+    StoppingPowerCoefficientE,
+    QCoefficientE,
+    EDependentCoefficient,
     XDependentCoefficient,
-    VelocityCoefficientOld,
-    VelocityCoefficient,
-    ConstantCoefficient
+    ConstantCoefficient,
 )
 
 class TestCoefficients(unittest.TestCase):
 
-    def test_TotalXSCoefficient(self):
-        xs_t_data = [1.0, 2.0, 3.0]
-        coeff = TotalXSCoefficient(xs_t_data, 0.0, 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.9]), 1.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 1.1]), 2.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 2.5]), 3.0)
+    # Test the TotalXSCoefficientE class.
+    def test_TotalXSCoefficientE(self):
+        data = [0,1,2,3,4]
+        coeff = TotalXSCoefficientE(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
 
-    def test_ScatteringXSCoefficient(self):
-        xs_s_data = [0.5, 1.5, 2.5]
-        coeff = ScatteringXSCoefficient(xs_s_data, 1.0, 4.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 1.0]), 0.5)
-        self.assertAlmostEqual(coeff.EvalValue([0, 2.5]), 1.5)
+    def test_TotalXSCoefficientE_constant(self):
+        coeff = TotalXSCoefficientE(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
 
-    def test_StoppingPowerCoefficient(self):
-        S_data = [10, 20, 30]
-        coeff = StoppingPowerCoefficient(S_data, 2.0, 5.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 2.0]), 10)
-        self.assertAlmostEqual(coeff.EvalValue([0, 4.9]), 30)
+    # Test the ScatteringXSCoefficientE class.
+    def test_ScatteringXSCoefficientE(self):
+        data = [0,1,2,3,4]
+        coeff = ScatteringXSCoefficientE(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
 
-    def test_StoppingPowerDerivativeCoefficient(self):
-        dS_data = [-1, -2, -3]
-        coeff = StoppingPowerDerivativeCoefficient(dS_data, E_start=0.0, E_end=3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.0]), -1)
-        self.assertAlmostEqual(coeff.EvalValue([0, 2.9]), -3)
+    def test_ScatteringXSCoefficientE_constant(self):
+        coeff = ScatteringXSCoefficientE(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
 
-    def test_InflowCoefficientSN_positive_mu(self):
-        coeff = InflowCoefficientSN(in_flux=5.0, mu=0.7)
-        self.assertEqual(coeff.EvalValue([0, 0]), 5.0)
-        self.assertEqual(coeff.EvalValue([10, 100]), 5.0)
+    # Test the StoppingPowerCoefficientE class.
+    def test_StoppingPowerCoefficientE(self):
+        data = [0,1,2,3,4]
+        coeff = StoppingPowerCoefficientE(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
+    
+    def test_StoppingPowerCoefficientE_constant(self):
+        coeff = StoppingPowerCoefficientE(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
 
-    def test_InflowCoefficientSN_negative_mu(self):
-        coeff = InflowCoefficientSN(in_flux=5.0, mu=-0.7)
-        self.assertEqual(coeff.EvalValue([0, 0]), 0.0)
-        self.assertEqual(coeff.EvalValue([10, 100]), 0.0)
+    # Test the QCoefficientE class.
+    def test_QCoefficientE(self):
+        data = [0,1,2,3,4]
+        coeff = QCoefficientE(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
+    
+    def test_QCoefficientE_constant(self):
+        coeff = QCoefficientE(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
 
-    def test_QCoefficient_constant(self):
-        coeff = QCoefficient(7.0)
-        self.assertEqual(coeff.EvalValue([0, 0.5]), 7.0)
+    # Test the EDependentCoefficient class.
+    def test_EDependentCoefficient(self):
+        data = [0,1,2,3,4]
+        coeff = EDependentCoefficient(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
+    
+    def test_EDependentCoefficient_constant(self):
+        coeff = EDependentCoefficient(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
 
-    def test_QCoefficient_energy_dependent(self):
-        Q_data = [1.0, 2.0, 3.0, 4.0]
-        coeff = QCoefficient(Q_data, 0.0, 4.0)
-        self.assertEqual(coeff.EvalValue([0, 0.0]), 1.0)
-        self.assertEqual(coeff.EvalValue([0, 3.9]), 4.0)
-
-    def test_EnergyDependentCoefficient(self):
-        data = [10.0, 20.0, 30.0]
-        coeff = EnergyDependentCoefficient(data, 0, 3)
-        self.assertAlmostEqual(coeff.EvalValue([0, 0.0]), 10.0)
-        self.assertAlmostEqual(coeff.EvalValue([0, 2.9]), 30.0)
-
-    def test_VelocityCoefficient(self):
-        mu = 0.8
-        S_arr = [1.0, 2.0, 3.0]
-        E_start, E_end = 0.0, 3.0
-        coeff = VelocityCoefficient(mu, S_arr, E_start, E_end)
-        self.assertEqual(coeff.EvalValue([0, 0.0]), [0.8, 1.0])
-        self.assertEqual(coeff.EvalValue([0, 2.9]), [0.8, 3.0])
-
-    def test_ConstantCoefficient(self):
-        const_value = 7.0
-        coeff = ConstantCoefficient(const_value)
-        self.assertEqual(coeff.EvalValue([0, 0.5]), 7.0)
-        self.assertEqual(coeff.EvalValue([10, 100]), 7.0)
-
+    # Test the XDependentCoefficient class.
     def test_XDependentCoefficient(self):
-        data = [1.0, 3.0, 5.0]
-        coeff = XDependentCoefficient(data, 0.0, 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0]), 1.0)
-        self.assertAlmostEqual(coeff.EvalValue([1.5, 0]), 3.0)
+        data = [0,1,2,3,4]
+        coeff = XDependentCoefficient(data, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 4.0)
+
+    def test_XDependentCoefficient_constant(self):
+        coeff = XDependentCoefficient(40, 1, 0.01)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
+
+    # Test the ConstantCoefficient class.
+    def test_ConstantCoefficient(self):
+        coeff = ConstantCoefficient(40.0)
+        self.assertEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
+        self.assertEqual(coeff.EvalValue([1.0, 2.0]), 40.0)
+        self.assertEqual(coeff.EvalValue([2.0, 3.0]), 40.0)
 
 if __name__ == '__main__':
     unittest.main()
