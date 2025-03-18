@@ -50,6 +50,4 @@ __all__ = [
     'glvis_visualize',
     'matplotlib_visualize',
     'mesh_report',
-    'HeatmapPlot',
-    'ScatterPlot'
 ]
