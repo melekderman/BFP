@@ -116,20 +116,20 @@ class TestCoefficients(unittest.TestCase):
         data = [0,1,2,3,4]
         coeff = XDependentCoefficient(data, 0.0, 1.0)
         self.assertAlmostEqual(coeff.EvalValue([0.0, 0.0]), 0.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 1.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 2.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 3.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 4.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.208, 0.0]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.406, 0.0]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.604, 0.0]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.802, 0.0]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([1.0, 0.0]), 4.0)
 
     def test_XDependentCoefficient_constant(self):
         coeff = XDependentCoefficient(40, 1, 0.01)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 1.0]), 40.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.802]), 40.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.604]), 40.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.406]), 40.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.208]), 40.0)
-        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.01]), 40.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.0, 0.0]), 0.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.208, 0.0]), 1.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.406, 0.0]), 2.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.604, 0.0]), 3.0)
+        self.assertAlmostEqual(coeff.EvalValue([0.802, 0.0]), 4.0)
+        self.assertAlmostEqual(coeff.EvalValue([1.0, 0.0]), 4.0)
 
     # Test the ConstantCoefficient class.
     def test_ConstantCoefficient(self):
