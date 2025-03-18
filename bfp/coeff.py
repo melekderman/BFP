@@ -482,4 +482,9 @@ def VectorConstCoefficient(vel1, vel2=None, vel3=None):
     Returns:
         VectorConstCoefficient: An instance of VectorConstCoefficient representing the constant velocity vector.
     """
-    return mfem.VectorConstantCoefficient([vel1, vel2, vel3])
+    if vel2 is None:
+        return mfem.VectorConstantCoefficient([vel1])
+    elif vel3 is None:
+        return mfem.VectorConstantCoefficient([vel1, vel2])
+    else:
+        return mfem.VectorConstantCoefficient([vel1, vel2, vel3])
