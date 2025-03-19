@@ -8,6 +8,7 @@ __all__ = [
     'ScatteringXSCoefficientE',
     'StoppingPowerCoefficientE',
     'QCoefficientE',
+    'QFuncCoefficient',
     'EDependentCoefficient',
     'XDependentCoefficient',
     'InflowCoefficient',
@@ -269,6 +270,38 @@ class QCoefficientE(mfem.PyCoefficient):
         return float(self.Q_data[-1])
 
 
+class QFuncCoefficient(mfem.PyCoefficient):
+    def __init__(self, pn, a_val=0, b_val=0, xs_t_val=0, mu_val=0, S_val=0):
+        super(QFuncCoefficient, self).__init__()
+        self.pn = pn
+        self.a_val = a_val
+        self.b_val = b_val
+        self.xs_t_val = xs_t_val
+        self.mu_val = float(mu_val)
+        self.S_val = S_val
+
+    def EvalValue(self, x):
+        if self.pn == 3:
+            return self.coeff_pn3(x)
+        elif self.pn == 4:
+            return self.coeff_pn4(x)
+        elif self.pn == 5:
+            return self.coeff_pn5(x)
+
+    def coeff_pn3(self, x):
+        return float(self.mu_val * self.b_val + self.xs_t_val * (self.a_val + self.b_val * x[0]))
+
+    def coeff_pn4(self, x):
+        return float(self.xs_t_val * (self.a_val + self.b_val * x[1]) + self.S_val * self.b_val)
+
+    def coeff_pn5(self, x):
+        print("Debug: self.mu =", self.mu_val, "x =", x)
+        sol =  self.mu_val * self.b_val * x[1] \
+            + self.xs_t_val * (self.a_val + self.b_val * x[0] * x[1]) \
+            + self.S_val * self.b_val * x[0]
+        return sol
+
+
 class EDependentCoefficient(mfem.PyCoefficient):
     """Coefficient class for energy-dependent values.
 
@@ -488,3 +521,5 @@ def VectorConstCoefficient(vel1, vel2=None, vel3=None):
         return mfem.VectorConstantCoefficient([vel1, vel2])
     else:
         return mfem.VectorConstantCoefficient([vel1, vel2, vel3])
+    
+

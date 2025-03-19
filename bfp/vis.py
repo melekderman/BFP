@@ -7,12 +7,14 @@ import pandas as pd
 
 
 __all__ = [
-    'glvis_visualize',
-    'matplotlib_visualize',
-    'mesh_report',
+    'GlVis_Visualizer',
+    'Matplotlib_Visualizer',
+    'Mesh_Report',
+    'GlVis_2D',
+    'GlVis_3D',
     ]
 
-def glvis_visualize(mesh, solution, title="CSDA Transport Solution"):
+def GlVis_Visualizer(mesh, solution, title="CSDA Transport Solution"):
     """Visualize the solution using GLVis.
 
     Args:
@@ -30,7 +32,7 @@ def glvis_visualize(mesh, solution, title="CSDA Transport Solution"):
     ss.send_text("\n")
 
 
-def matplotlib_visualize(mesh, solution, E_range, nx, nE, title):
+def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
     """Visualize the solution using matplotlib.
 
     Assumes the mesh is a structured Cartesian mesh.
@@ -76,7 +78,7 @@ def matplotlib_visualize(mesh, solution, E_range, nx, nE, title):
     plt.show()
 
 
-def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
+def Mesh_Report(mesh, width=600, height=600, num_vertices_to_print=None):
     """
     Print mesh information and visualize the mesh using glvis.
 
@@ -127,3 +129,14 @@ def mesh_report(mesh, width=600, height=600, num_vertices_to_print=None):
         print("glvis module is not available:", e)
     except RuntimeError as e:
         print("An error occurred during visualization:", e)
+
+
+def GlVis_2D(mesh, solution):
+    g = glvis((mesh, solution), 500,500, keys='ARjmcbp')
+    g.set_size(1000, 1000)
+    g.render()
+
+def GlVis_3D(mesh, solution):
+    g = glvis((mesh, solution), 500,500, keys='rljgac//0')
+    g.set_size(1000, 1000)
+    g.render()

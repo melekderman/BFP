@@ -5,10 +5,11 @@ import h5py
 __all__ = [
     'read_data',
     'gauss_legendre_dirs',
-    'compute_S_derivative',
+    'FiniteDiffDerivative',
     'gridfunction_to_array',
     'assign_boundary_attributes',
-    'get_marker_for_mu'
+    'get_marker_for_mu',
+    'save_angular_flux',
     ]
 
 def read_data(nE):
@@ -57,7 +58,7 @@ def gauss_legendre_dirs(N_dir):
     return mu.tolist(), w.tolist()
 
 
-def compute_S_derivative(E, S):
+def FiniteDiffDerivative(E, S):
     """Compute the derivative dS/dE using finite differences.
 
     This function approximates the derivative of S with respect to E by applying finite differences.
