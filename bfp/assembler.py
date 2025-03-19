@@ -23,14 +23,16 @@ def BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1):
     return dir_bdr1, dir_bdr2
 
 
-def FESpace(order, dim, mesh, btype=0):
+def FESpace(order, mesh):
+    #mesh.UniformRefinement()
+    dim = mesh.Dimension()
     fec = mfem.DG_FECollection(order, dim, btype=0)
     fes = mfem.FiniteElementSpace(mesh, fec)
     return fes
 
 
 def UniformRefinement(mesh, ref_level=0):
-    for i in range(ref_level):
+    for _ in range(ref_level):
         mesh.UniformRefinement()
     dim = mesh.Dimension()
     return mesh, dim
