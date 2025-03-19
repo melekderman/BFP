@@ -35,7 +35,6 @@
 PyMFEM/
 pyglvis/
 BFP.egg-info/
-bfp/mesh/usr/
 bfp/__all__.py
 tests/unit/mesh/
 
