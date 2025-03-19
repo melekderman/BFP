@@ -39,7 +39,8 @@ from .solver import (GMRES_solver,
                      Solve_Psi
 )
 
-from .assembler import (Bilinear_Form,
+from .assembler import (BoundaryConditions,
+                        Bilinear_Form,
                         Linear_Form,
 )
 
@@ -90,6 +91,7 @@ __all__ = [
     'Solve_Psi',
 
     # assembler.py
+    'BoundaryConditions',
     'Bilinear_Form',
     'Linear_Form',
     ]

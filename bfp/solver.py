@@ -39,7 +39,8 @@ def Solve_Phi(fes, psi_mu_list):
     return phi
 
 
-def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, iter_=1000, tol=1e-12, p_level=1):
+def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, 
+              alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, iter_=1000, tol=1e-12, p_level=1):
 
     psi_mu = []
     psi_mu_list = []
@@ -51,7 +52,8 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
         inflow_coeff = coeff.InflowCoefficient(inflow, mu)
         v_coeff1 = coeff.VectorConstCoefficient([mu, 0.0])
         v_coeff2 = coeff.VectorConstCoefficient([0.0, S_const])
-        q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const, mu_val=mu, S_val=S_const)
+        q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const, 
+                                         mu_val=mu, S_val=S_const)
 
         a = mfem.BilinearForm(fes)
         a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff1, 1.0))
@@ -79,11 +81,3 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
         psi_mu_list.append((mu, w, psi))
 
     return psi_mu_list
-
-    b = mfem.LinearForm(fes)
-    b.AddDomainIntegrator(mfem.DomainLFIntegrator(q_coeff))
-    b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff1, -alpha, -beta), dir_bdr1)
-    b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff2, -alpha, -beta), dir_bdr2)
-    b.Assemble()
-
-    return b
