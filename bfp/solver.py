@@ -22,7 +22,7 @@ def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1):
     return psi
 
 
-def Initial_Guess(psi_const, fes):
+def Initial_Guess(fes, psi_const):
     psi = mfem.GridFunction(fes)
     psi.Assign(psi_const)
     
