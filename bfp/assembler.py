@@ -2,6 +2,7 @@ import mfem.ser as mfem
 
 __all__ = ['BoundaryConditions',
            'FESpace',
+           'UniformRefinement',
            'Bilinear_Form',
            'Linear_Form',
            ]
@@ -26,6 +27,13 @@ def FESpace(order, dim, mesh, btype=1):
     fec = mfem.H1_FECollection(order, dim, btype)
     fes = mfem.FiniteElementSpace(mesh, fec)
     return fes
+
+
+def UniformRefinement(mesh, ref_level=0):
+    for i in range(ref_level):
+        mesh.UniformRefinement()
+    dim = mesh.Dimension()
+    return mesh, dim
 
 
 def Bilinear_Form(fes, v_coeff1, v_coeff2, xs_t_coeff, dir_bdr1, dir_bdr2, alpha = 1.0, beta = 0.5):

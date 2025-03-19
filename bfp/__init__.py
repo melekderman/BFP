@@ -41,6 +41,7 @@ from .solver import (GMRES_solver,
 
 from .assembler import (BoundaryConditions,
                         FESpace,
+                        UniformRefinement,
                         Bilinear_Form,
                         Linear_Form,
 )
@@ -94,6 +95,7 @@ __all__ = [
     # assembler.py
     'BoundaryConditions',
     'FESpace',
+    'UniformRefinement',
     'Bilinear_Form',
     'Linear_Form',
     ]
