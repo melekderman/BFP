@@ -24,7 +24,7 @@ def BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1):
 
 
 def FESpace(order, dim, mesh, btype=0):
-    fec = mfem.H1_FECollection(order, dim, btype)
+    fec = mfem.DG_FECollection(order, dim, btype=0)
     fes = mfem.FiniteElementSpace(mesh, fec)
     return fes
 
