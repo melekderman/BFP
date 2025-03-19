@@ -49,8 +49,8 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
         b = b_const
         print("  Solving for mu =", mu)
         inflow_coeff = coeff.InflowCoefficient(inflow, mu)
-        v_coeff1 = mfem.VectorConstantCoefficient([mu, 0.0])
-        v_coeff2 = mfem.VectorConstantCoefficient([0.0, S_const])
+        v_coeff1 = coeff.VectorConstCoefficient([mu, 0.0])
+        v_coeff2 = coeff.VectorConstCoefficient([0.0, S_const])
         q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const, mu_val=mu, S_val=S_const)
 
         a = mfem.BilinearForm(fes)
@@ -73,7 +73,7 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
 
         psi = Initial_Guess(fes, 1.0)
         GMRES_solver(A, b, psi, iter_, tol, p_level)
-        vis.glvis_2D(mesh, psi)
+        vis.GlVis_2D(mesh, psi)
         psi.Save("psi_hs_mu_{:.3f}.gf".format(mu))
         psi_mu.append(psi.GetDataArray())
         psi_mu_list.append((mu, w, psi))

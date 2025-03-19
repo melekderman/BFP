@@ -32,8 +32,6 @@
 *.app
 
 # Clones etc.
-PyMFEM/
-pyglvis/
 BFP.egg-info/
 bfp/__all__.py
 tests/unit/mesh/
