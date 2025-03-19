@@ -40,7 +40,7 @@ def Solve_Phi(fes, psi_mu_list):
 
 
 def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, 
-              alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, iter_=1000, tol=1e-12, p_level=1):
+              alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, q_const=0, E_start=0, E_end=0, iter_=1000, tol=1e-12, p_level=1):
 
     psi_mu = []
     psi_mu_list = []
@@ -52,7 +52,10 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
         inflow_coeff = coeff.InflowCoefficient(inflow, mu)
         v_coeff1 = coeff.VectorConstCoefficient([mu, 0.0])
         v_coeff2 = coeff.VectorConstCoefficient([0.0, S_const])
-        q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const, 
+        if pn == 1 or pn == 2:
+            q_coeff = coeff.QCoefficientE(q_const, E_start, E_end)
+        else:
+            q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const,
                                          mu_val=mu, S_val=S_const)
 
         a = mfem.BilinearForm(fes)

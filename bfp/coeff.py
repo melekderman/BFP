@@ -271,7 +271,7 @@ class QCoefficientE(mfem.PyCoefficient):
 
 
 class QFuncCoefficient(mfem.PyCoefficient):
-    def __init__(self, pn, a_val=0, b_val=0, xs_t_val=0, mu_val=0, S_val=0):
+    def __init__(self, pn, a_val=0, b_val=0, xs_t_val=0, mu_val=0, S_val=0, q_const=0):
         super(QFuncCoefficient, self).__init__()
         self.pn = pn
         self.a_val = a_val
@@ -279,6 +279,7 @@ class QFuncCoefficient(mfem.PyCoefficient):
         self.xs_t_val = xs_t_val
         self.mu_val = float(mu_val)
         self.S_val = S_val
+        self.q_const = q_const
 
     def EvalValue(self, x):
         if self.pn == 3:
