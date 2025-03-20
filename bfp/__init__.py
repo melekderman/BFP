@@ -28,8 +28,7 @@ from .utils import (read_data,
                     save_angular_flux,
 )
 
-from .coeff import (
-                    TotalXSCoefficientE,
+from .coeff import (TotalXSCoefficientE,
                     ScatteringXSCoefficientE,
                     StoppingPowerCoefficientE,
                     QCoefficientE,
@@ -48,10 +47,10 @@ from .solver import (GMRES_solver,
 )
 
 from .assemble import (BoundaryConditions,
-                        FESpace,
-                        UniformRefinement,
-                        Bilinear_Form,
-                        Linear_Form,
+                       FESpace,
+                       UniformRefinement,
+                       Bilinear_Form,
+                       Linear_Form,
 )
 
 from .vis import (GlVis_Visualizer,
@@ -68,7 +67,7 @@ __all__ = [
     'problem3_input',
     'problem4_input',
     'problem5_input',
-    
+
     # mesh.py
     'create_2D_mesh',
     'create_3D_mesh',

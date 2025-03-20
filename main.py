@@ -1,7 +1,7 @@
 # main.py
 
 import argparse
-from input import (
+from bfp.input import (
     problem1_input,
     problem2_input,
     problem3_input,
@@ -10,10 +10,30 @@ from input import (
 )
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Run a selected problem input function with default parameters.\n" +
-                    "Example: python main.py -p 4 (runs Problem 4)"
+    description=(
+        "Run a selected problem input function with customizable parameters.\n\n"
+        "Available problems:\n"
+        "  1: Infinite Medium: ψ = Q/σₜ\n"
+        "  2: Exponential Attenuation: ψ(x) = Q/σₜ + ψₗ * exp(-σₜ * x / μ)\n"
+        "  3: MMS - Linear in x: ψ = a + b * x\n"
+        "  4: MMS - Linear in E: ψ = a + b * E\n"
+        "  5: Mixed: ψ = a + b * xE\n\n"
+        "The following parameters can be provided:\n"
+        "  nx (int): Number of cells in the x-direction (default: 10).\n"
+        "  nE (int): Number of energy cells (default: 10).\n"
+        "  N_ang (int): Number of angles for the SN method (default: 2).\n"
+        "  iter_ (int): Maximum number of solver iterations (default: 1000).\n"
+        "  tol (float): Solver tolerance (default: 1e-12).\n"
+        "  p_level (int): Print level (1 for verbose, 0 for silent; default: 1).\n\n"
+        "Example usage:\n"
+        "  python main.py -p 4 --nx 15 --nE 12"
     )
+
+    parser = argparse.ArgumentParser(
+    description=description,
+    formatter_class=argparse.RawTextHelpFormatter
+    )
+
     parser.add_argument(
         "-p", "--problem",
         type=int,
@@ -21,24 +41,60 @@ def main():
         required=True,
         help="Problem number to run (choose 1, 2, 3, 4, or 5)."
     )
+    parser.add_argument(
+        "--nx",
+        type=int,
+        default=10,
+        help="Number of cells in the x-direction (default: 10)."
+    )
+    parser.add_argument(
+        "--nE",
+        type=int,
+        default=10,
+        help="Number of energy cells (default: 10)."
+    )
+    parser.add_argument(
+        "--N_ang",
+        type=int,
+        default=2,
+        help="Number of angles for the SN method (default: 2)."
+    )
+    parser.add_argument(
+        "--iter_",
+        type=int,
+        default=1000,
+        help="Maximum number of solver iterations (default: 1000)."
+    )
+    parser.add_argument(
+        "--tol",
+        type=float,
+        default=1e-12,
+        help="Solver tolerance (default: 1e-12)."
+    )
+    parser.add_argument(
+        "--p_level",
+        type=int,
+        default=1,
+        help="Print level (1 for verbose, 0 for silent; default: 1)."
+    )
     
     args = parser.parse_args()
     
     if args.problem == 1:
-        result = problem1_input()
-        print("Calculated phi for Problem 1:", result)
+        problem1_input()
+        print("Problem 51 results has successfully saved.")
     elif args.problem == 2:
-        result = problem2_input()
-        print("Calculated phi for Problem 2:", result)
+        problem2_input()
+        print("Problem 2 results has successfully saved.")
     elif args.problem == 3:
-        result = problem3_input()
-        print("Calculated phi for Problem 3:", result)
+        problem3_input()
+        print("Problem 3 results has successfully saved.")
     elif args.problem == 4:
-        result = problem4_input()
-        print("Calculated phi for Problem 4:", result)
+        problem4_input()
+        print("Problem 4 results has successfully saved.")
     elif args.problem == 5:
-        result = problem5_input()
-        print("Calculated phi for Problem 5:", result)
+        problem5_input()
+        print("Problem 5 results has successfully saved.")
     else:
         print("Selected problem is not exist.")
 
