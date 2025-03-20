@@ -1,5 +1,17 @@
 # input.py
-from  bfp import *
+
+from bfp.mesh import create_2D_mesh
+from bfp.assemble import FESpace, BoundaryConditions
+from bfp.coeff import TotalXSCoefficientE
+from bfp.utils import gauss_legendre_dirs
+from bfp.solver import Solve_Psi, Solve_Phi
+
+__all__ = ['problem1_input',
+        'problem2_input',
+        'problem3_input',
+        'problem4_input',
+        'problem5_input',
+        ]
 
 
 def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
