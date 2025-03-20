@@ -132,11 +132,11 @@ def Mesh_Report(mesh, width=600, height=600, num_vertices_to_print=None):
 
 
 def GlVis_2D(mesh, solution):
-    g = glvis((mesh, solution), 500,500, keys='ARjmcbp')
+    g = glvis((mesh, solution), 500,500, keys='aRjLGmcbp')
     g.set_size(1000, 1000)
     g.render()
 
 def GlVis_3D(mesh, solution):
-    g = glvis((mesh, solution), 500,500, keys='rljgac//0')
+    g = glvis((mesh, solution), 500,500, keys='ArljmGac//0./')
     g.set_size(1000, 1000)
     g.render()

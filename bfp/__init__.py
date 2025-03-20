@@ -1,3 +1,4 @@
+# __init__.py
 """
 Problem Package for the CSDA Transport Equation Solver using PyMFEM.
 
@@ -39,7 +40,7 @@ from .solver import (GMRES_solver,
                      Solve_Psi
 )
 
-from .assembler import (BoundaryConditions,
+from .assemble import (BoundaryConditions,
                         FESpace,
                         UniformRefinement,
                         Bilinear_Form,
@@ -92,7 +93,7 @@ __all__ = [
     'Solve_Phi',
     'Solve_Psi',
 
-    # assembler.py
+    # assemble.py
     'BoundaryConditions',
     'FESpace',
     'UniformRefinement',
