@@ -82,7 +82,7 @@ def main():
     
     if args.problem == 1:
         problem1_input()
-        print("Problem 51 results has successfully saved.")
+        print("Problem 1 results has successfully saved.")
     elif args.problem == 2:
         problem2_input()
         print("Problem 2 results has successfully saved.")

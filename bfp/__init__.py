@@ -8,13 +8,6 @@ solvers, and visualization.
 
 __version__ = "0.0.1"
 
-from .input import (problem1_input,
-                    problem2_input,
-                    problem3_input,
-                    problem4_input,
-                    problem5_input,
-)
-
 from .mesh import (create_2D_mesh,
                    create_3D_mesh
 )
@@ -58,16 +51,10 @@ from .vis import (GlVis_Visualizer,
                   Mesh_Report,
                   GlVis_2D,
                   GlVis_3D,
+                  visualize_sol,
 )
 
 __all__ = [
-    # input.py
-    'problem1_input',
-    'problem2_input',
-    'problem3_input',
-    'problem4_input',
-    'problem5_input',
-
     # mesh.py
     'create_2D_mesh',
     'create_3D_mesh',
@@ -99,6 +86,7 @@ __all__ = [
     'Mesh_Report',
     'GlVis_2D',
     'GlVis_3D',
+    'visualize_sol',
 
     # solver.py
     'GMRES_solver',

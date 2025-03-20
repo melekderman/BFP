@@ -296,7 +296,6 @@ class QFuncCoefficient(mfem.PyCoefficient):
         return float(self.xs_t_val * (self.a_val + self.b_val * x[1]) + self.S_val * self.b_val)
 
     def coeff_pn5(self, x):
-        print("Debug: self.mu =", self.mu_val, "x =", x)
         sol =  self.mu_val * self.b_val * x[1] \
             + self.xs_t_val * (self.a_val + self.b_val * x[0] * x[1]) \
             + self.S_val * self.b_val * x[0]

@@ -1,10 +1,19 @@
 # input.py
+import os
+os.environ['DISPLAY'] = ':0'
+
+from mfem.ser import mfem
+from mfem.ser import socketstream
+from glvis import glvis
+from glvis.widget import GlvisWidget
+from ipywidgets.embed import embed_minimal_html
 
 from bfp.mesh import create_2D_mesh
 from bfp.assemble import FESpace, BoundaryConditions
 from bfp.coeff import TotalXSCoefficientE
 from bfp.utils import gauss_legendre_dirs
 from bfp.solver import Solve_Psi, Solve_Phi
+from bfp.vis import visualize_sol
 
 __all__ = ['problem1_input',
         'problem2_input',
@@ -50,7 +59,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
 
     # Create mesh
     mesh = create_2D_mesh(nx, nE, x_start, x_end, E_start, E_end)
-
+    dim = mesh.Dimension()
     # Define finite element space
     fes = FESpace(order, mesh)
 
@@ -66,6 +75,16 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
                                  a, b, q_const, E_start, E_end, iter_, tol, p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
+
+    # Visualize the solution
+    flux_sock = socketstream("localhost", 19916)
+    flux_sock.precision(8)
+    flux_sock.send_text("solution\n")
+    flux_sock.send_solution(mesh, phi)
+    flux_sock.send_text("\n")
+    flux_sock.flush()
+    widget = GlvisWidget((mesh, phi), 600, 600, keys="ArljmGac//0")
+    widget.render()
 
     return phi
 

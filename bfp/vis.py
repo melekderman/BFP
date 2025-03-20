@@ -2,8 +2,7 @@ import mfem.ser as mfem
 import matplotlib.pyplot as plt
 import numpy as np
 from glvis import glvis
-import seaborn as sns
-import pandas as pd
+from mfem.ser import socketstream
 
 
 __all__ = [
@@ -12,6 +11,7 @@ __all__ = [
     'Mesh_Report',
     'GlVis_2D',
     'GlVis_3D',
+    'visualize_sol',
     ]
 
 def GlVis_Visualizer(mesh, solution, title="CSDA Transport Solution"):
@@ -140,3 +140,21 @@ def GlVis_3D(mesh, solution):
     g = glvis((mesh, solution), 500,500, keys='ArljmGac//0./')
     g.set_size(1000, 1000)
     g.render()
+
+    # This function was taken from the PyMFEM 
+# https://github.com/mfem/PyMFEM/blob/06e1efa9b0bc5bc5a13246e2e73d85badecf60ad/miniapps/gslib/field_diff.py#L174
+def visualize_sol(sol, mesh, dim, title: str = "Mesh and solution",
+                    vishost: str = "localhost", visport: int = 19916,
+                    geometry: str = "0 0 600 600", keys: str = "ArljmGac//0./"):
+    sol_sock = socketstream("localhost", 19916)
+    sol_sock.precision(8)
+    sol_sock << "solution\n" << mesh << x
+    sol_sock << "window_title 'Solution'\n"
+    sol.sock.flush()
+    flux_sock = socketstream("localhost", 19916)
+    flux_sock.precision(8)
+    flux_sock << "solution\n" << mesh << flux
+    flux_sock << "keys vvv\n"
+    flux_sock << "window_geometry 402 0 400 350\n"
+    flux_sock << "window_title 'Flux'\n"
+    flux_sock.flush()
