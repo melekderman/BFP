@@ -43,7 +43,7 @@ Install BFP along with dependencies using:
 ```bash
 pip install .
 ```
-## 📊 Usage & Visualization with PyGLVis
+## 📈 Usage & Visualization with PyGLVis
 
 BFP integrates with **PyGLVis**, which is a Jupyter-compatible visualization toolkit. To effectively visualize results:
 
@@ -64,7 +64,7 @@ Refer to the PyGLVis Documentation: [PyGLVis](https://github.com/GLVis/pyglvis) 
 
 ---
 
-## 🧪 Running Tests
+## 🔬 Running Tests
 
 After installation, run the provided tests to verify your setup.
 
@@ -103,7 +103,7 @@ This project is supported by the **Center for Exascale Monte-Carlo Neutron Trans
 
 ---
 
-🌟 **Contact** 🌟
+📧 **Contact** 📧
 
 For any inquiries or further details, please contact:
 
