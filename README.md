@@ -1,56 +1,110 @@
-# Boltzman Fokker-Plank Charged Particle Transport Solver
+# ⚡ Boltzmann Fokker-Planck Charged Particle Transport Solver (BFP)
 
 [![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml)
 
-This package offers a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with [PyMFEM](https://github.com/mfem/PyMFEM) and [pyglvis](https://github.com/GLVis/pyglvis). The following instructions provide guidance on installation, running the solver, and testing.
+## 👀 Overview
 
-To clone this repository, use the following command:
-```
+BFP provides a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with: 
+[PyMFEM](https://github.com/mfem/PyMFEM): Python wrapper for MFEM library, supporting FEM simulations.
+[pyglvis](https://github.com/GLVis/pyglvis). Interactive visualization tool for finite element methods, designed especially for Jupyter notebooks.
+
+This package simplifies setup and visualization of BFP simulations, designed specifically for Charged Particle Transport Problems.
+
+### Step 1: Clone the Repository
+
+```bash
 git clone https://github.com/melekderman/BFP.git
+cd BFP
 ```
 
-## Installation
+### Step 2: Set Up Your Python Environment
 
-It is recommended to work within isolated environments when installing this package.
-
-### Environment Setup
+We recommend using a virtual or Conda environment.
 
 #### Virtual Environment
 
-Create and activate a virtual environment using Python 3.11:
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
 ```
-    cd BFP
-    python3.11 -m venv .venv
-    source .venv/bin/activate
-```
+
 #### Conda Environment
 
-If you prefer using Conda, create and activate an environment as follows:
+```bash
+conda create --name BFP-env python==3.11
+conda activate BFP-env
 ```
-    conda create --name BFP-env python==3.11
-    conda activate BFP-env
+### Step 3: Install BFP
+
+Install BFP along with dependencies using:
+
+```bash
+pip install .
 ```
-### Known issues with pip version
+## 📊 Usage & Visualization with PyGLVis
 
-Some versions of pip may produce errors. The version known to work reliably is pip 23.2.1. Please ensure your pip version is compatible before proceeding with the installation.
+BFP integrates with **PyGLVis**, which is a Jupyter-compatible visualization toolkit. To effectively visualize results:
 
-## Testing
+1. Ensure Jupyter is installed and run the notebook:
 
-Details on how to run tests and verify the installation will be added here.
-
-```
-python test.py -serial
-```
-```
-python test.py -parallel
+```bash
+pip install jupyter
+jupyter notebook
 ```
 
-## Acknowledgements
+2. In a Jupyter notebook, initialize PyGLVis:
 
-This work was supported by the Center for Exascale Monte-Carlo Neutron Transport (CEMeNT) a PSAAP-III project funded by the Department of Energy, grant number: DE-NA003967.
+```python
+import glvis
+glvis(mesh, solution)
+```
+Refer to the PyGLVis Documentation: [PyGLVis](https://github.com/GLVis/pyglvis) for more examples.
 
-## License
+---
 
-BFP is licensed under a BSD-3 clause license. We believe in open source software.
+## 🧪 Running Tests
+
+After installation, run the provided tests to verify your setup.
+
+#### Serial Testing
+
+```bash
+cd tests/unit/
+python test_coeff.py
+python test_mesh.py
+```
+
+#### Parallel Testing *(upcoming feature)*
+
+```bash
+python test_coeff.py --parallel
+python test_mesh.py --parallel
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are welcome! Please open an issue: https://github.com/melekderman/BFP/issues or submit a pull request: https://github.com/melekderman/BFP/pulls.
+
+---
+
+## 📜 License
+
+BFP is released under the BSD-3 Clause License. See LICENSE file for details.
+
+---
+
+## 💬 Acknowledgements
+
+This project is supported by the **Center for Exascale Monte-Carlo Neutron Transport (CEMeNT)**, a PSAAP-III project funded by the Department of Energy (DOE), grant number: DE-NA003967.
+
+---
+
+🌟 **Contact** 🌟
+
+For any inquiries or further details, please contact:
+
+📧 Melek Derman – dermanm@oregonstate.edu
