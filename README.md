@@ -47,14 +47,8 @@ pip install .
 
 BFP integrates with **PyGLVis**, which is a Jupyter-compatible visualization toolkit. To effectively visualize results:
 
-1. Ensure Jupyter is installed and run the notebook:
 
-```bash
-pip install jupyter
-jupyter notebook
-```
-
-2. In a Jupyter notebook, initialize PyGLVis:
+### In a Jupyter notebook, initialize PyGLVis:
 
 ```python
 import glvis
@@ -103,7 +97,7 @@ This project is supported by the **Center for Exascale Monte-Carlo Neutron Trans
 
 ---
 
-📧 **Contact** 📧
+📮 **Contact** 📮
 
 For any inquiries or further details, please contact:
 
