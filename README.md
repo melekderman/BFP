@@ -1,4 +1,4 @@
-# ⚡ Boltzmann Fokker-Planck Charged Particle Transport Solver (BFP)
+# Boltzmann Fokker-Planck Charged Particle Transport Solver (BFP)
 
 [![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
