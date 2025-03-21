@@ -98,6 +98,6 @@ This project is supported by the **Center for Exascale Monte-Carlo Neutron Trans
 
 📮 **Contact** 📮
 
-For any inquiries or further details, please contact:
+For any questions or further details, please contact:
 
 📧 Melek Derman – dermanm@oregonstate.edu
