@@ -8,7 +8,7 @@
 
 BFP provides a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with: 
 [PyMFEM](https://github.com/mfem/PyMFEM): Python wrapper for MFEM library, supporting FEM simulations.
-[pyglvis](https://github.com/GLVis/pyglvis). Interactive visualization tool for finite element methods, designed especially for Jupyter notebooks.
+[PyGLVis](https://github.com/GLVis/pyglvis). Interactive visualization tool for finite element methods, designed especially for Jupyter notebooks.
 
 This package simplifies setup and visualization of BFP simulations, designed specifically for Charged Particle Transport Problems.
 
@@ -43,10 +43,9 @@ Install BFP along with dependencies using:
 ```bash
 pip install .
 ```
-## 📈 Usage & Visualization with PyGLVis
+## 📈 Usage & Visualization
 
 BFP integrates with **PyGLVis**, which is a Jupyter-compatible visualization toolkit. To effectively visualize results:
-
 
 ### In a Jupyter notebook, initialize PyGLVis:
 
