@@ -16,7 +16,6 @@ __all__ = ['problem1_input',
         'problem5_input',
         ]
 
-
 def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     """
     Executes Problem 1: Infinite Medium Problem, ψ = Q/σₜ
@@ -74,7 +73,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
 
 def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     """
-    Executes Problem 2: S=0 Problem,  ψ(x) = Q/σₜ + ψₗ * exp(-σₜ * x / μ).
+    Executes Problem 2: S=0 Problem,  ψ(x) = ψₗ * exp(-σₜ * x / μ).
 
     Args:
         nx (int): Number of cells in the x-direction.
