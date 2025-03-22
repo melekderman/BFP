@@ -61,7 +61,7 @@ Refer to the PyGLVis Documentation: [PyGLVis](https://github.com/GLVis/pyglvis) 
 
 After installation, run the provided tests to verify your setup.
 
-#### Serial Testing
+#### Testing in Serial Mode
 
 ```bash
 cd tests/unit/
@@ -70,7 +70,7 @@ python test_mesh.py
 python test_prob.py
 ```
 
-#### Parallel Testing *(upcoming feature)*
+#### Testing in Parallel Mode *(upcoming feature)*
 
 ```bash
 python test_coeff.py --parallel
