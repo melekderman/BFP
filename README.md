@@ -78,6 +78,11 @@ python test_mesh.py --parallel
 
 ---
 
+## 📚 Documentation
+For more information about the modules, please visit the [documentation](https://melekderman.github.io/BFP/).
+
+---
+
 ## 🤝 Contributing
 
 Contributions, bug reports, and feature requests are welcome! Please open an issue: https://github.com/melekderman/BFP/issues or submit a pull request: https://github.com/melekderman/BFP/pulls.
