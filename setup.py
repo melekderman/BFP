@@ -115,7 +115,7 @@ setup(
     "ipywidgets>=8.0.0",
     "requests",
     "h5py",
-    "seaborn"
+    "seaborn",
     "pandas",
 ],
     author="Melek Derman",
