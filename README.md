@@ -21,19 +21,12 @@ cd BFP
 
 ### Step 2: Set Up Your Python Environment
 
-We recommend using a virtual or Conda environment.
-
-#### Virtual Environment
-
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-```
+We recommend using an environment.
 
 #### Conda Environment
 
 ```bash
-conda create --name BFP-env python==3.11
+conda create -n BFP-env python==3.11
 conda activate BFP-env
 ```
 ### Step 3: Install BFP
