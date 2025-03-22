@@ -54,6 +54,13 @@ from .vis import (GlVis_Visualizer,
                   visualize_sol,
 )
 
+from .input import (problem1_input,
+                   problem2_input,
+                   problem3_input,
+                   problem4_input,
+                   problem5_input,
+)
+
 __all__ = [
     # mesh.py
     'create_2D_mesh',
@@ -100,4 +107,11 @@ __all__ = [
     'UniformRefinement',
     'Bilinear_Form',
     'Linear_Form',
+
+    # input.py
+    'problem1_input',
+    'problem2_input',   
+    'problem3_input',
+    'problem4_input',
+    'problem5_input',
     ]

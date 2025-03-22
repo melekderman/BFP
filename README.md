@@ -65,8 +65,8 @@ After installation, run the provided tests to verify your setup.
 
 ```bash
 cd tests/unit/
-python test_coeff.py
-python test_mesh.py
+python test_coeff.py -v
+python test_mesh.py -v
 ```
 
 #### Parallel Testing *(upcoming feature)*
