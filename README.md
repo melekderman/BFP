@@ -102,7 +102,7 @@ This project is supported by the **Center for Exascale Monte-Carlo Neutron Trans
 
 ---
 
-📮 **Contact** 📮
+📮 **Contact**
 
 For any questions or further details, please contact:
 
