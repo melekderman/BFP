@@ -72,6 +72,34 @@ python test_mesh.py --parallel
 
 ---
 
+## ⚛️ Examples
+
+```bash
+Run a selected problem input function with customizable parameters.
+
+Available problems:
+1: Infinite Medium: ψ = Q/σₜ
+2: Exponential Attenuation: ψ(x) = ψₗ * exp(-σₜ * x / μ)
+3: MMS - Linear in x: ψ = a + b * x
+4: MMS - Linear in E: ψ = a + b * E
+5: Mixed: ψ = a + b * xE
+
+The following parameters can be provided:
+nx (int): Number of cells in the x-direction (default: 10).
+nE (int): Number of energy cells (default: 10).
+N_ang (int): Number of angles for the SN method (default: 2).
+iter_ (int): Maximum number of solver iterations (default: 1000).
+tol (float): Solver tolerance (default: 1e-12).
+p_level (int): Print level (1 for verbose, 0 for silent; default: 1).
+``` 
+
+```bash
+Example usage:
+python main.py -p 4 --nx 15 --nE 12
+```
+
+---
+
 ## 📚 Documentation
 For more information about the modules, please visit the [documentation](https://melekderman.github.io/BFP/).
 (The documentation page will be updated soon to include all functions.)
