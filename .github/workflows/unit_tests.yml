@@ -33,3 +33,4 @@ jobs:
     - name: Run unit tests
       run: |
         pytest tests/unit/
+        pytest tests/verification/
