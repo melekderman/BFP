@@ -1,12 +1,6 @@
 # Boltzmann Fokker-Planck Charged Particle Transport Solver (BFP)
 
-[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100)
-
-[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
-[![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml)
-
-[![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
+[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100)[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)[![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml)[![ReadTheDocs](https://readthedocs.org/projects/bfp/badge/?version=latest&style=flat)](https://bfp.readthedocs.org/en/latest/ )
 
 ## 👀 Overview
 
