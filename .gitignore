@@ -38,3 +38,5 @@ tests/unit/mesh/
 
 # Cache folder
 bfp/__pycache__/
+*.__pycache__
+*.pyc
