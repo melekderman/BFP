@@ -4,6 +4,8 @@
 
 ## 👀 Overview
 
+**Note: This project is currently under development and solves the Boltzmann equation with energy–spatial coupling under the Continuous Slowing Down (CSD) approximation. To achieve the software’s ultimate objectives, I am now focusing on adding the Fokker–Planck scattering term.**
+
 BFP provides a solver for Boltzman Fokker-Plank charged-particle transport problems, seamlessly integrating with: 
 [PyMFEM](https://github.com/mfem/PyMFEM): Python wrapper for MFEM library, supporting FEM simulations.
 [PyGLVis](https://github.com/GLVis/pyglvis). Interactive visualization tool for finite element methods, designed especially for Jupyter notebooks.
