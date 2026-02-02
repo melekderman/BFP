@@ -1,0 +1,57 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: BFP
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Melek
+    family-names: Derman
+    email: dermanm@oregonstate.edu
+    affiliation: Oregon State University
+    orcid: 'https://orcid.org/0000-0002-6124-6771'
+  - given-names: Todd S.
+    family-names: Palmer
+    email: todd.palmer@oregonstate.edu
+    affiliation: Oregon State University
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.15107101
+    description: The URL of version 0.1.1 of the software
+repository-code: 'https://github.com/melekderman/BFP.git'
+abstract: >-
+  Note: This project is currently under development and
+  solves the Boltzmann equation with energy–spatial coupling
+  under the Continuous Slowing Down (CSD) approximation. To
+  achieve the software’s ultimate objectives, I am now
+  focusing on adding the Fokker–Planck scattering term.
+
+
+  BFP provides a solver for Boltzman Fokker-Plank
+  charged-particle transport problems, seamlessly
+  integrating with: PyMFEM: Python wrapper for MFEM library,
+  supporting FEM simulations. PyGLVis. Interactive
+  visualization tool for finite element methods, designed
+  especially for Jupyter notebooks.
+
+
+  This package simplifies setup and visualization of BFP
+  simulations, designed specifically for Charged Particle
+  Transport Problems.
+keywords:
+  - Boltzman Equation
+  - ' Fokker-Plank'
+  - ' Fokker Plank'
+  - Charged Particle Transport
+  - Radiation Transport
+  - Particle Transport
+  - Nuclear Engineering
+  - Nuclear Physics
+  - Nuclear Science
+license: BSD-3-Clause
+commit: '2e89613'
+version: v0.1.1
+date-released: '2025-03-29'
