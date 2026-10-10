@@ -3,23 +3,19 @@ import numpy as np
 import mfem.ser as mfem
 import os
 
-__all__ = ['create_2D_mesh',
-           'create_3D_mesh'
-           ]
+__all__ = ["create_2D_mesh", "create_3D_mesh"]
+
 
 def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
-    """Creates a 2D mesh with the specified intervals and coordinate ranges.
+    """Return a structured quadrilateral MFEM mesh with nx-by-ny elements.
 
-    Args:
-        nx (int): Number of intervals in the x-direction.
-        ny (int): Number of intervals in the y-direction.
-        x_start (float): Starting x-coordinate.
-        x_end (float): Ending x-coordinate.
-        y_start (float): Starting y-coordinate.
-        y_end (float): Ending y-coordinate.
+    ``x_start``/``x_end`` and ``y_start``/``y_end`` give coordinate bounds.
+    For transport, use increasing position bounds in cm and physical kinetic
+    energy bounds in MeV; ``ny`` counts energy elements. The solver uses this
+    single coupled (x, E) mesh, not separate spatial and energy meshes.
 
-    Returns:
-        mesh: The updated mesh with vertex coordinates set accordingly.
+    Creates ``mesh/usr/`` in the working directory and writes
+    ``{nx}x{ny}_2D.mesh`` if absent, independently of solver output controls.
     """
 
     x_coords = np.linspace(x_start, x_end, nx + 1)
@@ -32,7 +28,11 @@ def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
     num_verts = mesh.GetNV()
 
     if num_verts != expected_num:
-        print("Warning: Unexpected number of vertices! ({} != {})".format(num_verts, expected_num))
+        print(
+            "Warning: Unexpected number of vertices! ({} != {})".format(
+                num_verts, expected_num
+            )
+        )
 
     k = 0
     for j in range(ny + 1):
@@ -41,8 +41,8 @@ def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
             verts[k][1] = y_coords[j]
             k += 1
 
-    target_dir = os.path.join(os.getcwd(), 'mesh', 'usr')
-    file_name = f'{nx}x{ny}_2D.mesh'
+    target_dir = os.path.join(os.getcwd(), "mesh", "usr")
+    file_name = f"{nx}x{ny}_2D.mesh"
     file_path = os.path.join(target_dir, file_name)
 
     if not os.path.exists(target_dir):
@@ -57,7 +57,8 @@ def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
 
     return mesh
 
-'''
+
+"""
 # Example usage:
 nx = 20
 ny = 50
@@ -76,25 +77,16 @@ glvis(mesh)
 verts = mesh.GetVertexArray()
 for k, v in enumerate(verts):
     print("Vertex {}: {}".format(k, v))
-'''
+"""
 
 
 def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
-    """Creates a 3D mesh with specified intervals and coordinate ranges.
+    """Return a structured hexahedral MFEM mesh with nx-by-ny-by-nz elements.
 
-    Args:
-        nx (int): Number of intervals in the x-direction.
-        ny (int): Number of intervals in the y-direction.
-        nz (int): Number of intervals in the z-direction.
-        x_start (float): Starting x-coordinate.
-        x_end (float): Ending x-coordinate.
-        y_start (float): Starting y-coordinate.
-        y_end (float): Ending y-coordinate.
-        z_start (float): Starting z-coordinate.
-        z_end (float): Ending z-coordinate.
-
-    Returns:
-        mesh: The updated 3D mesh with vertex coordinates set accordingly.
+    The start/end arguments bound each coordinate. This is a geometry helper;
+    BFP's transport solvers currently support only the two-coordinate (x, E)
+    slab formulation. Creates ``mesh/usr/{nx}x{ny}_3D.mesh`` if absent in the
+    working directory; the legacy filename does not include nz.
     """
 
     x_coords = np.linspace(x_start, x_end, nx + 1)
@@ -108,7 +100,11 @@ def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
     expected_num = (nx + 1) * (ny + 1) * (nz + 1)
     num_verts = mesh.GetNV()
     if num_verts != expected_num:
-        print("Warning: Unexpected number of vertices! ({} != {})".format(num_verts, expected_num))
+        print(
+            "Warning: Unexpected number of vertices! ({} != {})".format(
+                num_verts, expected_num
+            )
+        )
 
     k = 0
     for k_z in range(nz + 1):
@@ -119,8 +115,8 @@ def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
                 verts[k][2] = z_coords[k_z]
                 k += 1
 
-    target_dir = os.path.join(os.getcwd(), 'mesh', 'usr')
-    file_name = f'{nx}x{ny}_3D.mesh'
+    target_dir = os.path.join(os.getcwd(), "mesh", "usr")
+    file_name = f"{nx}x{ny}_3D.mesh"
     file_path = os.path.join(target_dir, file_name)
 
     if not os.path.exists(target_dir):
@@ -136,7 +132,8 @@ def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
 
     return mesh
 
-'''
+
+"""
 # Example usage:
 nx = 20
 ny = 50
@@ -159,4 +156,4 @@ verts2 = mesh2.GetVertexArray()
 for k, v in enumerate(verts2):
     print("Vertex {}: {}".format(k, v))
 
-'''
+"""

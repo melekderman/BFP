@@ -2,16 +2,18 @@ import mfem.ser as mfem
 import numpy as np
 import h5py
 
+from bfp.angular import gauss_legendre_dirs
 
 __all__ = [
-    'read_data',
-    'gauss_legendre_dirs',
-    'FiniteDiffDerivative',
-    'gridfunction_to_array',
-    'assign_boundary_attributes',
-    'get_marker_for_mu',
-    'save_angular_flux',
-    ]
+    "read_data",
+    "gauss_legendre_dirs",
+    "FiniteDiffDerivative",
+    "gridfunction_to_array",
+    "assign_boundary_attributes",
+    "get_marker_for_mu",
+    "save_angular_flux",
+]
+
 
 def read_data(nE):
     """Read cross-section and stopping power data from an HDF5 file.
@@ -35,28 +37,9 @@ def read_data(nE):
         E_grid_arr = f[f"E_grid_{nE}"][:]
         xs_t_arr = f[f"xs_t_{nE}"][:]
         xs_s_arr = f[f"xs_s_{nE}"][:]
-        S_arr    = f[f"S_{nE}"][:]
+        S_arr = f[f"S_{nE}"][:]
 
     return E_arr, E_grid_arr, xs_t_arr, xs_s_arr, S_arr
-
-
-def gauss_legendre_dirs(N_dir):
-    """Compute Gauss-Legendre quadrature points and weights for discrete ordinates.
-
-    This function computes the Gauss-Legendre quadrature points (mu_i) and weights (w_i)
-    for the specified number of discrete ordinates using NumPy's polynomial module.
-
-    Args:
-        N_dir (int): The number of discrete ordinates.
-
-    Returns:
-        tuple: A tuple containing two lists:
-            - mu (list of float): The Gauss-Legendre quadrature points.
-            - w (list of float): The corresponding Gauss-Legendre quadrature weights.
-    """
-
-    mu, w = np.polynomial.legendre.leggauss(N_dir)
-    return mu.tolist(), w.tolist()
 
 
 def FiniteDiffDerivative(E, S):
@@ -108,7 +91,7 @@ def assign_boundary_attributes(mesh, x_bound, E_bound, x_end, tol=1e-6):
       - If any vertex of a boundary element is near (x_bound, E_bound), assign attribute 1.
       - Else if any vertex of a boundary element is near x_end, assign attribute 2.
       - Otherwise, leave the attribute as 0.
-    
+
     Parameters:
       mesh    : The mfem.Mesh object.
       x_bound : The x-coordinate for the left (inflow) boundary.
@@ -139,11 +122,11 @@ def get_marker_for_mu(mesh, mu):
     Returns a marker array based on the mesh boundary attributes and the sign of mu.
       - If mu > 0, only boundaries with attribute 1 (left/inflow) are marked.
       - If mu < 0, only boundaries with attribute 2 (right/inflow) are marked.
-    
+
     Parameters:
       mesh : The mfem.Mesh object (its boundary attributes should already be set).
       mu   : The angular variable.
-    
+
     Returns:
       marker (mfem.intArray): An integer array with 1's where the appropriate boundary
                               (inflow) is active and 0's elsewhere.
@@ -169,4 +152,3 @@ def save_angular_flux(psi, mu):
     """
     filename = "psi_mu_{:.4f}.gf".format(mu)
     psi.Save(filename)
-

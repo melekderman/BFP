@@ -9,7 +9,7 @@ class TestMeshCreation(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.target_dir = os.path.join(os.getcwd(), 'mesh', 'usr')
+        cls.target_dir = os.path.join(os.getcwd(), "mesh", "usr")
         if os.path.exists(cls.target_dir):
             shutil.rmtree(cls.target_dir)
 
@@ -19,7 +19,7 @@ class TestMeshCreation(unittest.TestCase):
         y_start, y_end = 0.0, 2.0
 
         mesh = create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end)
-        
+
         self.assertEqual(mesh.GetNV(), (nx + 1) * (ny + 1))
 
         verts = mesh.GetVertexArray()
@@ -33,7 +33,7 @@ class TestMeshCreation(unittest.TestCase):
                 self.assertAlmostEqual(verts[k][1], y_coords[j])
                 k += 1
 
-        expected_file = os.path.join(self.target_dir, f'{nx}x{ny}_2D.mesh')
+        expected_file = os.path.join(self.target_dir, f"{nx}x{ny}_2D.mesh")
         self.assertTrue(os.path.exists(expected_file))
 
     def test_create_3D_mesh(self):
@@ -42,7 +42,9 @@ class TestMeshCreation(unittest.TestCase):
         y_start, y_end = 0.0, 1.0
         z_start, z_end = 0.0, 1.0
 
-        mesh = create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end)
+        mesh = create_3D_mesh(
+            nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end
+        )
 
         self.assertEqual(mesh.GetNV(), (nx + 1) * (ny + 1) * (nz + 1))
 
@@ -60,9 +62,9 @@ class TestMeshCreation(unittest.TestCase):
                     self.assertAlmostEqual(verts[k][2], z_coords[k_z])
                     k += 1
 
-        expected_file = os.path.join(self.target_dir, f'{nx}x{ny}_3D.mesh')
+        expected_file = os.path.join(self.target_dir, f"{nx}x{ny}_3D.mesh")
         self.assertTrue(os.path.exists(expected_file))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

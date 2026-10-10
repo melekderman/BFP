@@ -1,22 +1,28 @@
 # input.py
 import os
-os.environ['DISPLAY'] = ':0'
+import mfem.ser as mfem
+
+os.environ["DISPLAY"] = ":0"
 
 from bfp.mesh import create_2D_mesh
 from bfp.assemble import FESpace, BoundaryConditions
 from bfp.coeff import TotalXSCoefficientE
-from bfp.utils import gauss_legendre_dirs
-from bfp.solver import Solve_Psi, Solve_Phi
+from bfp.angular import gauss_legendre_dirs
+from bfp.solver import Solve_Psi, Solve_Phi, Solve_Transport
+
+__all__ = [
+    "problem1_input",
+    "problem2_input",
+    "problem3_input",
+    "problem4_input",
+    "problem5_input",
+    "slab_input",
+]
 
 
-__all__ = ['problem1_input',
-        'problem2_input',
-        'problem3_input',
-        'problem4_input',
-        'problem5_input',
-        ]
-
-def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem1_input(
+    nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False
+):
     """
     Executes Problem 1: Infinite Medium Problem, ψ = Q/σₜ
 
@@ -27,6 +33,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
 
     Returns:
         phi: The computed solution.
@@ -43,7 +50,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     alpha = 1.0
     beta = 0.5
 
-    # Problem 1: ψ = Q/σₜ, 
+    # Problem 1: ψ = Q/σₜ,
     pn = 1
     inflow = 20.0
     S_const = 5.0
@@ -64,16 +71,42 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
-                                 inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+    psi_mu_pos_list, info = Solve_Psi(
+        pn,
+        mu_vals,
+        w_vals,
+        mesh,
+        fes,
+        xs_t_coeff,
+        xs_t_const,
+        inflow,
+        S_const,
+        alpha,
+        beta,
+        dir_bdr1,
+        dir_bdr2,
+        a_const=a,
+        b_const=b,
+        q_const=q_const,
+        E_start=E_start,
+        E_end=E_end,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        return_info=True,
+    )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+
+def problem2_input(
+    nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False
+):
     """
-    Executes Problem 2: S=0 Problem,  ψ(x) = ψₗ * exp(-σₜ * x / μ).
+    Executes Problem 2: spatial attenuation with a constant source and S=0.
 
     Args:
         nx (int): Number of cells in the x-direction.
@@ -82,6 +115,7 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
 
     Returns:
         phi: The computed solution.
@@ -97,7 +131,7 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     alpha = 1.0
     beta = 0.5
 
-    # Problem 2: ψ(x) = Q/σₜ + ψₗ * exp(-σₜ * x / μ) 
+    # Problem 2: spatial attenuation with a constant source and S=0.
     pn = 2
     inflow = 10.0
     S_const = 0.0
@@ -118,17 +152,43 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
-                                 inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+    psi_mu_pos_list, info = Solve_Psi(
+        pn,
+        mu_vals,
+        w_vals,
+        mesh,
+        fes,
+        xs_t_coeff,
+        xs_t_const,
+        inflow,
+        S_const,
+        alpha,
+        beta,
+        dir_bdr1,
+        dir_bdr2,
+        a_const=a,
+        b_const=b,
+        q_const=q_const,
+        E_start=E_start,
+        E_end=E_end,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        return_info=True,
+    )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+
+def problem3_input(
+    nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False
+):
     """
     Executes Problem 3: MMS Problem,  ψ = a + b * x.
-    
+
     Parameters:
         nx (int): Number of cells in the x-direction.
         nE (int): Number of energy cells.
@@ -136,7 +196,8 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose output, 0 for silent operation).
-    
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
+
     Returns:
         phi: The computed solution for Problem 3.
     """
@@ -152,7 +213,7 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     beta = 0.5
 
     # Problem 3: ψ = a+bx
-    pn=3
+    pn = 3
     inflow = 5.0
     S_const = 0.0
     xs_t_const = 5.0
@@ -172,17 +233,43 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: first calculate psi, then calculate phi.
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
-                                 inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+    psi_mu_pos_list, info = Solve_Psi(
+        pn,
+        mu_vals,
+        w_vals,
+        mesh,
+        fes,
+        xs_t_coeff,
+        xs_t_const,
+        inflow,
+        S_const,
+        alpha,
+        beta,
+        dir_bdr1,
+        dir_bdr2,
+        a_const=a,
+        b_const=b,
+        q_const=q_const,
+        E_start=E_start,
+        E_end=E_end,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        return_info=True,
+    )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+
+def problem4_input(
+    nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False
+):
     """
     Executes Problem 4: MMS Problem, ψ = a + b * E.
-    
+
     Parameters:
         nx (int): Number of cells in the x-direction.
         nE (int): Number of energy cells.
@@ -190,7 +277,8 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose output, 0 for silent operation).
-    
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
+
     Returns:
         phi: The computed solution for Problem 4.
     """
@@ -206,7 +294,7 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     beta = 0.5
 
     # Problem 4: ψ = a+bE
-    pn=4
+    pn = 4
     inflow = 5.0
     S_const = 2.0
     xs_t_const = 5.0
@@ -226,17 +314,43 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: first calculate psi, then calculate phi.
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
-                                 inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+    psi_mu_pos_list, info = Solve_Psi(
+        pn,
+        mu_vals,
+        w_vals,
+        mesh,
+        fes,
+        xs_t_coeff,
+        xs_t_const,
+        inflow,
+        S_const,
+        alpha,
+        beta,
+        dir_bdr1,
+        dir_bdr2,
+        a_const=a,
+        b_const=b,
+        q_const=q_const,
+        E_start=E_start,
+        E_end=E_end,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        return_info=True,
+    )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+
+def problem5_input(
+    nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False
+):
     """
     Executes Problem 5: ψ = a + b * xE.
-    
+
     Args:
         nx (int): Number of cells in the x-direction.
         nE (int): Number of energy cells.
@@ -244,7 +358,8 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
-    
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
+
     Returns:
         phi: The computed solution.
     """
@@ -260,7 +375,7 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     beta = 0.5
 
     # Problem 5: ψ = a+bxE
-    pn=5
+    pn = 5
     inflow = 5.0
     S_const = 2.0
     xs_t_const = 5.0
@@ -279,12 +394,96 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi and then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
-                                 inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, iter_=iter_, tol=tol, p_level=p_level)
+    psi_mu_pos_list, info = Solve_Psi(
+        pn,
+        mu_vals,
+        w_vals,
+        mesh,
+        fes,
+        xs_t_coeff,
+        xs_t_const,
+        inflow,
+        S_const,
+        alpha,
+        beta,
+        dir_bdr1,
+        dir_bdr2,
+        a_const=a,
+        b_const=b,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        return_info=True,
+    )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
 
+def slab_input(
+    model,
+    nx=10,
+    nE=10,
+    N_ang=2,
+    iter_=1000,
+    tol=1e-12,
+    p_level=1,
+    *,
+    visualize=True,
+    save=True,
+    return_info=False,
+):
+    """Run the fixed FP/GFP2 slab example with zero spatial/high-energy inflow.
 
+    ``model`` is ``"fp"`` or ``"gfp2"``. The domain is x in [0, 1] cm and
+    E in [0, 1] MeV, with ``nx`` by ``nE`` first-order DG elements and
+    ``N_ang`` Gauss–Legendre directions. Stopping power is 1 MeV/cm,
+    absorption is 1 inverse cm and isotropic source is 1 in flux units per cm.
+    Low energy is outflow. FP uses transport cross section 1 inverse cm;
+    GFP2 uses alpha=0.6 inverse cm and beta=0.1 (dimensionless).
+
+    Solver and output controls follow :func:`~bfp.solver.Solve_Transport`.
+    Return the scalar-flux GridFunction, or ``(phi, global_diagnostics)``
+    when ``return_info=True``. Mesh creation still writes a mesh file when
+    ``save=False``. This is not the Leakeas–Larsen benchmark.
+    """
+    if model not in ("fp", "gfp2"):
+        raise ValueError("The slab example supports only 'fp' and 'gfp2'.")
+    mesh = create_2D_mesh(nx, nE, 0.0, 1.0, 0.0, 1.0)
+    fes = FESpace(1, mesh)
+    mu_vals, w_vals = gauss_legendre_dirs(N_ang)
+    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh)
+    one = mfem.ConstantCoefficient(1.0)
+    if model == "fp":
+        scattering = dict(transport_coeff=one)
+    else:
+        scattering = dict(
+            alpha_coeff=mfem.ConstantCoefficient(0.6),
+            beta_coeff=mfem.ConstantCoefficient(0.1),
+        )
+    flux, info = Solve_Transport(
+        model,
+        mu_vals=mu_vals,
+        w_vals=w_vals,
+        mesh=mesh,
+        fes=fes,
+        absorption_coeff=one,
+        S_coeff=one,
+        q_coeff=one,
+        inflow=mfem.ConstantCoefficient(0.0),
+        dir_bdr1=dir_bdr1,
+        dir_bdr2=dir_bdr2,
+        **scattering,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        visualize=visualize,
+        save=save,
+        return_info=True,
+    )
+    phi = Solve_Phi(fes, flux, save=save)
+    if return_info:
+        return phi, info
+    return phi

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bfp-transport"
+dynamic = ["version"]
+description = "CSDA, Fokker-Planck and GFP2 charged-particle transport using PyMFEM"
+readme = "README.md"
+requires-python = ">=3.9,<3.12"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [{name = "Melek Derman", email = "dermanm@oregonstate.edu"}]
+dependencies = [
+    "mfem==4.7.0.1",
+    "glvis>=1.1.1",
+    "requests",
+    "numpy>=1.20,<2",
+    "matplotlib",
+    "h5py",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Repository = "https://github.com/melekderman/BFP"
+Documentation = "https://melekderman.github.io/BFP/"
+
+[project.scripts]
+bfp = "main:main"
+
+[tool.setuptools]
+packages = ["bfp"]
+py-modules = ["main"]
+
+[tool.setuptools.dynamic]
+version = {attr = "bfp.__version__"}
+
+[tool.setuptools.package-data]
+bfp = ["data/*.h5"]
