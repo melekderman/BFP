@@ -6,9 +6,9 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 project = "BFP"
-copyright = "2025, Melek Derman"
+copyright = "2026, Melek Derman"
 author = "Melek Derman"
-release = "0.0.1"
+release = "0.2.0"
 
 extensions = [
     "sphinx.ext.autodoc",

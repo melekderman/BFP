@@ -16,10 +16,10 @@ authors:
 identifiers:
   - type: doi
     value: 10.5281/zenodo.15107101
-    description: The URL of version 0.1.1 of the software
+    description: The URL of version 0.2.0 of the software
 repository-code: 'https://github.com/melekderman/BFP.git'
 abstract: >-
-  BFP is a research software platform for developing and evaluating computational methods for strongly forward-peaked charged-particle transport, including angular scattering models, numerical discretizations, and scalable solution algorithms. The current development implementation supports deterministic CSDA, Fokker–Planck–CSDA, and GFP2–CSDA transport in slab geometry using a coupled spatial–energy discontinuous Galerkin discretization and serial PyMFEM. MPI and GPU transport solvers remain future development goals; the archived v0.1.1 release cited above predates these current features.
+  BFP is a research software tool for developing and evaluating computational methods for strongly forward-peaked charged-particle transport, including angular scattering models, numerical discretizations, and scalable solution algorithms. The current development implementation supports deterministic CSDA, Fokker–Planck–CSDA, and GFP2–CSDA transport in slab geometry using a coupled spatial–energy discontinuous Galerkin discretization and serial PyMFEM. MPI and GPU transport solvers remain future development goals; the archived v0.2.0 release cited above predates these current features.
 keywords:
   - Boltzmann Equation
   - Fokker-Planck
@@ -30,7 +30,13 @@ keywords:
   - Nuclear Engineering
   - Nuclear Physics
   - Nuclear Science
+  - Computational Physics
+  - Applied Mathematics
+  - Numerical Methods
+  - Scientific Computing
+  - High Performance Computing
+  - Parallel Computing
+  - Electron Transport
 license: BSD-3-Clause
-commit: '2e89613'
-version: v0.1.1
-date-released: '2025-03-29'
+version: v0.2.0
+date-released: '2026-10-10'

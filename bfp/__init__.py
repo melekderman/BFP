@@ -6,7 +6,7 @@ This package contains modules for mesh generation, system assembly,
 solvers, and visualization.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.2.0"
 
 from .mesh import create_2D_mesh, create_3D_mesh
 
