@@ -1,5 +1,5 @@
 import mfem.ser as mfem
-from bfp import vis, coeff
+from bfp import assemble, vis, coeff
 
 __all__ = ['GMRES_solver',
             'Initial_Guess',
@@ -30,26 +30,29 @@ def Initial_Guess(fes, psi_const):
     return psi
 
 
-def Solve_Phi(fes, psi_mu_list):
+def Solve_Phi(fes, psi_mu_list, *, save=True):
+    """Integrate angular flux; set save=False to skip the scalar flux file."""
     phi = mfem.GridFunction(fes)
     # PyMFEM 4.7 GridFunction does not retain its finite element space.
     phi._fes = fes
     phi.Assign(0.0)
     for _, w, X in psi_mu_list:
         phi.Add(w, X)
-    phi.Save("phi_dg.gf")
+    if save:
+        phi.Save("phi_dg.gf")
 
     return phi
 
 
 def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, 
               alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, q_const=0, E_start=0, E_end=0, iter_=1000, tol=1e-12, p_level=1,
-              *, S_coeff=None, q_coeff=None):
+              *, S_coeff=None, q_coeff=None, visualize=True, save=True):
     """Solve in physical (x, E); S_coeff overrides positive S_const.
 
     S_coeff is a continuous MFEM scalar coefficient. For variable-S MMS,
     supply q_coeff including -d(S*psi)/dE and the exact inflow coefficient.
     Both energy faces must be marked: high-E inflow and low-E outflow.
+    Set visualize=False and save=False to disable GLVis and flux files.
     """
     if S_coeff is not None and pn in (3, 4, 5) and q_coeff is None:
         raise ValueError("Variable-S manufactured solutions require q_coeff.")
@@ -59,7 +62,6 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
     energy_direction = coeff.VectorConstCoefficient(0.0, -1.0)
     v_coeff2 = mfem.ScalarVectorProductCoefficient(S_coeff, energy_direction)
 
-    psi_mu = []
     psi_mu_list = []
 
     for mu, w in zip(mu_vals, w_vals):
@@ -77,30 +79,17 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
             q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const,
                                          mu_val=mu, S_val=S_const)
 
-        a = mfem.BilinearForm(fes)
-        a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff1, 1.0))
-        # Conservative energy weak form includes dS/dE without differentiating S.
-        a.AddDomainIntegrator(mfem.ConservativeConvectionIntegrator(v_coeff2, 1.0))
-        a.AddDomainIntegrator(mfem.MassIntegrator(xs_t_coeff))
-        a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)))
-        a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)), dir_bdr1)
-        a.AddInteriorFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta))
-        a.AddBdrFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta), dir_bdr2)
-        a.Assemble()
-        a.Finalize()
-        A = a.SpMat()
-
-        b = mfem.LinearForm(fes)
-        b.AddDomainIntegrator(mfem.DomainLFIntegrator(q_coeff))
-        b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff1, -alpha, -beta), dir_bdr1)
-        b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff2, -alpha, -beta), dir_bdr2)
-        b.Assemble()
+        A = assemble.Bilinear_Form(fes, v_coeff1, v_coeff2, xs_t_coeff,
+                                  dir_bdr1, dir_bdr2, alpha=alpha, beta=beta)
+        b = assemble.Linear_Form(fes, q_coeff, inflow_coeff, v_coeff1, v_coeff2,
+                                 dir_bdr1, dir_bdr2, alpha=alpha, beta=beta)
 
         psi = Initial_Guess(fes, 1.0)
         GMRES_solver(A, b, psi, iter_, tol, p_level)
-        vis.GlVis_2D(mesh, psi)
-        psi.Save("psi_hs_mu_{:.3f}.gf".format(mu))
-        psi_mu.append(psi.GetDataArray())
+        if visualize:
+            vis.GlVis_2D(mesh, psi)
+        if save:
+            psi.Save("psi_hs_mu_{:.3f}.gf".format(mu))
         psi_mu_list.append((mu, w, psi))
 
     return psi_mu_list

@@ -10,7 +10,7 @@ from bfp.assemble import BoundaryConditions, FESpace, Bilinear_Form, Linear_Form
 from bfp.coeff import VectorConstCoefficient
 from bfp.input import problem1_input, problem2_input, problem3_input, problem4_input, problem5_input
 from bfp.mesh import create_2D_mesh
-from bfp.solver import Solve_Psi, GMRES_solver, Initial_Guess
+from bfp.solver import Solve_Psi, Solve_Phi, GMRES_solver, Initial_Guess
 
 
 class AnalyticCoefficient(mfem.PyCoefficient):
@@ -32,6 +32,29 @@ class TestProblems(unittest.TestCase):
         display = patch('bfp.vis.GlVis_2D')
         display.start()
         self.addCleanup(display.stop)
+
+    def test_optional_output(self):
+        mesh = mfem.Mesh(2, 3, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        mu, weights = np.polynomial.legendre.leggauss(2)
+        xs = mfem.ConstantCoefficient(5.0)
+        args = (5, mu, weights, mesh, fes, xs, 5.0, 5.0, 2.0,
+                1.0, 0.5, *BoundaryConditions(mesh), 5.0, 10.0)
+
+        with patch('bfp.vis.GlVis_2D') as display:
+            angular = Solve_Psi(*args, p_level=0, visualize=False, save=False)
+            phi = Solve_Phi(fes, angular, save=False)
+            display.assert_not_called()
+            self.assertEqual(os.listdir(), [])
+
+            with_output = Solve_Psi(*args, p_level=0)
+            saved_phi = Solve_Phi(fes, with_output)
+            self.assertEqual(display.call_count, len(mu))
+        self.assertEqual(set(os.listdir()), {
+            'phi_dg.gf', *('psi_hs_mu_{:.3f}.gf'.format(m) for m in mu)})
+        np.testing.assert_array_equal(phi.GetDataArray(), saved_phi.GetDataArray())
+        for (_, _, psi), (_, _, saved) in zip(angular, with_output):
+            np.testing.assert_array_equal(psi.GetDataArray(), saved.GetDataArray())
 
     def test_manufactured_problems(self):
         cases = [
