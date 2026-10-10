@@ -12,17 +12,17 @@
 
 import os, sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 # Build API documentation without installing the numerical backend.
 autodoc_mock_imports = ["mfem", "numpy", "matplotlib", "h5py", "glvis"]
 
 # -- Project information -----------------------------------------------------
 
-project = 'BFP'
-copyright = '2025, Melek Derman'
-author = 'Melek Derman'
-release = 'v0.0.1'
+project = "BFP"
+copyright = "2025, Melek Derman"
+author = "Melek Derman"
+release = "v0.0.1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -30,20 +30,21 @@ release = 'v0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-extensions = ["sphinx.ext.autodoc", 
-              "sphinx.ext.napoleon", 
-              "sphinx.ext.mathjax", 
-              "sphinx.ext.intersphinx",
-              "sphinx.ext.githubpages",
-              "sphinx.ext.autosummary",
-              "sphinx_toolbox.github",
-              "sphinx_toolbox.sidebar_links",
-              "sphinx.ext.autosectionlabel",
-              'myst_parser', 
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.autosummary",
+    "sphinx_toolbox.github",
+    "sphinx_toolbox.sidebar_links",
+    "sphinx.ext.autosectionlabel",
+    "myst_parser",
 ]
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.11', None)
+    "python": ("https://docs.python.org/3.11", None)
     # 'PyMFEM': ('https://github.com/mfem/PyMFEM', None),
     # 'glvis': ('https://github.com/GLVis/pyglvis', None),
 }
@@ -70,7 +71,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "classic"
-#html_logo = "images/home/logo.svg"
+# html_logo = "images/home/logo.svg"
 
 # html_permalinks = ['https://cement-psaap.github.io/', 'https://github.com/CEMeNT-PSAAP/MCDC']
 

@@ -4,26 +4,31 @@ import mfem.ser as mfem
 import numpy as np
 
 __all__ = [
-    'gfp2_coefficients',
-    'TotalXSCoefficientE',
-    'ScatteringXSCoefficientE',
-    'StoppingPowerCoefficientE',
-    'QCoefficientE',
-    'QFuncCoefficient',
-    'EDependentCoefficient',
-    'XDependentCoefficient',
-    'InflowCoefficient',
-    'ConstantCoefficient',
-    'VectorConstCoefficient',
-    ]
+    "gfp2_coefficients",
+    "TotalXSCoefficientE",
+    "ScatteringXSCoefficientE",
+    "StoppingPowerCoefficientE",
+    "QCoefficientE",
+    "QFuncCoefficient",
+    "EDependentCoefficient",
+    "XDependentCoefficient",
+    "InflowCoefficient",
+    "ConstantCoefficient",
+    "VectorConstCoefficient",
+]
+
 
 def gfp2_coefficients(sigma_a1, sigma_a2):
     """Map elastic angular relaxation cross sections (not absorption) to alpha, beta."""
     sigma_a1 = np.asarray(sigma_a1, dtype=float)
     sigma_a2 = np.asarray(sigma_a2, dtype=float)
-    if (not np.all(np.isfinite(sigma_a1)) or not np.all(np.isfinite(sigma_a2))
-            or np.any(sigma_a1 <= 0.0) or np.any(sigma_a2 <= sigma_a1)
-            or np.any(sigma_a2 > 3.0 * sigma_a1)):
+    if (
+        not np.all(np.isfinite(sigma_a1))
+        or not np.all(np.isfinite(sigma_a2))
+        or np.any(sigma_a1 <= 0.0)
+        or np.any(sigma_a2 <= sigma_a1)
+        or np.any(sigma_a2 > 3.0 * sigma_a1)
+    ):
         raise ValueError("GFP2 requires 0 < sigma_a1 < sigma_a2 <= 3*sigma_a1.")
     beta = (3.0 * sigma_a1 - sigma_a2) / (6.0 * (sigma_a2 - sigma_a1))
     alpha = 0.5 * sigma_a1 * (1.0 + 2.0 * beta)
@@ -33,7 +38,7 @@ def gfp2_coefficients(sigma_a1, sigma_a2):
 
 
 class TotalXSCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the total macroscopic cross-section Σ_t(E). 
+    """Coefficient class for the total macroscopic cross-section Σ_t(E).
     (This coefficient will be updated for Σ_t(x,E))
 
     This class provides a piecewise-constant coefficient function based on energy groups.
@@ -89,9 +94,9 @@ class TotalXSCoefficientE(mfem.PyCoefficient):
             return self.constant_value
         E = x[1]
         for i in range(self.n_groups - 1):
-            if np.isclose(E, self.E_bins[i+1]):
-                return float(self.xs_t_data[i+1])
-            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+            if np.isclose(E, self.E_bins[i + 1]):
+                return float(self.xs_t_data[i + 1])
+            if E <= self.E_bins[i] and E > self.E_bins[i + 1]:
                 return float(self.xs_t_data[i])
         return float(self.xs_t_data[-1])
 
@@ -153,9 +158,9 @@ class ScatteringXSCoefficientE(mfem.PyCoefficient):
             return self.constant_value
         E = x[1]
         for i in range(self.n_groups - 1):
-            if np.isclose(E, self.E_bins[i+1]):
-                return float(self.xs_s_data[i+1])
-            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+            if np.isclose(E, self.E_bins[i + 1]):
+                return float(self.xs_s_data[i + 1])
+            if E <= self.E_bins[i] and E > self.E_bins[i + 1]:
                 return float(self.xs_s_data[i])
         return float(self.xs_s_data[-1])
 
@@ -190,6 +195,7 @@ class StoppingPowerCoefficientE(mfem.PyCoefficient):
         Energy-dependent stopping power:
             StoppingPowerCoefficientE(S_data, E_start=1.0, E_end=0.01)
     """
+
     def __init__(self, S_data, E_start, E_end):
         super(StoppingPowerCoefficientE, self).__init__()
         self.E_start = E_start
@@ -216,15 +222,15 @@ class StoppingPowerCoefficientE(mfem.PyCoefficient):
             return self.constant_value
         E = x[1]
         for i in range(self.n_groups - 1):
-            if np.isclose(E, self.E_bins[i+1]):
-                return float(self.S_data[i+1])
-            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+            if np.isclose(E, self.E_bins[i + 1]):
+                return float(self.S_data[i + 1])
+            if E <= self.E_bins[i] and E > self.E_bins[i + 1]:
                 return float(self.S_data[i])
         return float(self.S_data[-1])
 
 
 class QCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the energy-dependent source term Q(E). 
+    """Coefficient class for the energy-dependent source term Q(E).
     (This coefficient will be updated for Q(x,E))
 
     This class provides a piecewise-constant coefficient function based on energy groups.
@@ -253,6 +259,7 @@ class QCoefficientE(mfem.PyCoefficient):
         Energy-dependent source term:
             QCoefficient(Q_data, E_start=1.0, E_end=0.01)
     """
+
     def __init__(self, Q_data, E_start, E_end):
         super(QCoefficientE, self).__init__()
         self.E_start = E_start
@@ -279,9 +286,9 @@ class QCoefficientE(mfem.PyCoefficient):
             return self.constant_value
         E = x[1]
         for i in range(self.n_groups - 1):
-            if np.isclose(E, self.E_bins[i+1]):
-                return float(self.Q_data[i+1])
-            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+            if np.isclose(E, self.E_bins[i + 1]):
+                return float(self.Q_data[i + 1])
+            if E <= self.E_bins[i] and E > self.E_bins[i + 1]:
                 return float(self.Q_data[i])
         return float(self.Q_data[-1])
 
@@ -306,15 +313,21 @@ class QFuncCoefficient(mfem.PyCoefficient):
             return self.coeff_pn5(x)
 
     def coeff_pn3(self, x):
-        return float(self.mu_val * self.b_val + self.xs_t_val * (self.a_val + self.b_val * x[0]))
+        return float(
+            self.mu_val * self.b_val + self.xs_t_val * (self.a_val + self.b_val * x[0])
+        )
 
     def coeff_pn4(self, x):
-        return float(self.xs_t_val * (self.a_val + self.b_val * x[1]) - self.S_val * self.b_val)
+        return float(
+            self.xs_t_val * (self.a_val + self.b_val * x[1]) - self.S_val * self.b_val
+        )
 
     def coeff_pn5(self, x):
-        sol =  self.mu_val * self.b_val * x[1] \
-            + self.xs_t_val * (self.a_val + self.b_val * x[0] * x[1]) \
+        sol = (
+            self.mu_val * self.b_val * x[1]
+            + self.xs_t_val * (self.a_val + self.b_val * x[0] * x[1])
             - self.S_val * self.b_val * x[0]
+        )
         return sol
 
 
@@ -347,6 +360,7 @@ class EDependentCoefficient(mfem.PyCoefficient):
         Energy-dependent coefficient:
             EDependentCoefficient(data, E_start=1.0, E_end=0.01)
     """
+
     def __init__(self, data, E_start, E_end):
         super(EDependentCoefficient, self).__init__()
         self.E_start = E_start
@@ -373,9 +387,9 @@ class EDependentCoefficient(mfem.PyCoefficient):
             return self.constant_value
         E = x[1]
         for i in range(self.n_groups - 1):
-            if np.isclose(E, self.E_bins[i+1]):
-                return float(self.data[i+1])
-            if E <= self.E_bins[i] and E > self.E_bins[i+1]:
+            if np.isclose(E, self.E_bins[i + 1]):
+                return float(self.data[i + 1])
+            if E <= self.E_bins[i] and E > self.E_bins[i + 1]:
                 return float(self.data[i])
         return float(self.data[-1])
 
@@ -387,7 +401,7 @@ class XDependentCoefficient(mfem.PyCoefficient):
     The spatial range is defined from x_start (lower bound) to x_end (upper bound),
     with spatial values sorted in ascending order. The corresponding spatial-dependent
     values in data are also arranged from lower to upper according to their grouping.
-    
+
     Attributes:
         x_start (float): Lower bound of the spatial range.
         x_end (float): Upper bound of the spatial range.
@@ -405,6 +419,7 @@ class XDependentCoefficient(mfem.PyCoefficient):
         Spatial-dependent coefficient:
             XDependentCoefficient(data, x_start=0.0, x_end=10.0)
     """
+
     def __init__(self, data, x_start, x_end):
         super(XDependentCoefficient, self).__init__()
         self.x_start = x_start
@@ -432,9 +447,9 @@ class XDependentCoefficient(mfem.PyCoefficient):
 
         x_val = x[0]
         for i in range(self.n_groups - 1):
-            if np.isclose(x_val, self.x_bins[i+1]):
-                return float(self.data[i+1])
-            if self.x_bins[i] <= x_val < self.x_bins[i+1]:
+            if np.isclose(x_val, self.x_bins[i + 1]):
+                return float(self.data[i + 1])
+            if self.x_bins[i] <= x_val < self.x_bins[i + 1]:
                 return float(self.data[i])
         return float(self.data[-1])
 
@@ -454,7 +469,7 @@ class InflowCoefficient(mfem.PyCoefficient):
 
     Args:
         inflow (float): The inflow value to be used.
-        mu (float): The angular direction (e.g., cosine of the angle) used to determine if the 
+        mu (float): The angular direction (e.g., cosine of the angle) used to determine if the
             inflow condition is met.
         xl (bool, optional): If True, apply the inflow condition on the left boundary (when mu > 0).
             Defaults to None.
@@ -498,8 +513,8 @@ class InflowCoefficient(mfem.PyCoefficient):
             if self.mu > 0:
                 return self.inflow
             else:
-                return 0.0 
-        
+                return 0.0
+
         elif self.xr is True and self.xl is not True:
             if self.mu < 0:
                 return self.inflow
@@ -519,6 +534,7 @@ class ConstantCoefficient(mfem.PyCoefficient):
     Args:
         const (float): The constant value to be returned.
     """
+
     def __init__(self, const):
         super(ConstantCoefficient, self).__init__()
         self.const = const
@@ -551,5 +567,3 @@ def VectorConstCoefficient(vel1, vel2=None, vel3=None):
         return mfem.VectorConstantCoefficient([vel1, vel2])
     else:
         return mfem.VectorConstantCoefficient([vel1, vel2, vel3])
-    
-

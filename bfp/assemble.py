@@ -1,15 +1,16 @@
 import mfem.ser as mfem
 import numpy as np
 
-__all__ = ['BoundaryConditions',
-           'FESpace',
-           'UniformRefinement',
-           'Bilinear_Form',
-           'Linear_Form',
-           'Mass_Matrix',
-           'FP_Matrix',
-           'GFP2_Matrix',
-           ]
+__all__ = [
+    "BoundaryConditions",
+    "FESpace",
+    "UniformRefinement",
+    "Bilinear_Form",
+    "Linear_Form",
+    "Mass_Matrix",
+    "FP_Matrix",
+    "GFP2_Matrix",
+]
 
 
 def BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1):
@@ -28,7 +29,7 @@ def BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1):
 
 
 def FESpace(order, mesh):
-    #mesh.UniformRefinement()
+    # mesh.UniformRefinement()
     dim = mesh.Dimension()
     fec = mfem.DG_FECollection(order, dim, btype=0)
     fes = mfem.FiniteElementSpace(mesh, fec)
@@ -42,15 +43,22 @@ def UniformRefinement(mesh, ref_level=0):
     return mesh, dim
 
 
-def Bilinear_Form(fes, v_coeff1, v_coeff2, xs_t_coeff, dir_bdr1, dir_bdr2, alpha = 1.0, beta = 0.5):
+def Bilinear_Form(
+    fes, v_coeff1, v_coeff2, xs_t_coeff, dir_bdr1, dir_bdr2, alpha=1.0, beta=0.5
+):
     """Assemble transport with energy velocity v_coeff2 = (0, -S(E))."""
     a = mfem.BilinearForm(fes)
     a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff1, 1.0))
     # Conservative energy weak form includes dS/dE without differentiating S.
     a.AddDomainIntegrator(mfem.ConservativeConvectionIntegrator(v_coeff2, 1.0))
     a.AddDomainIntegrator(mfem.MassIntegrator(xs_t_coeff))
-    a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)))
-    a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)), dir_bdr1)
+    a.AddInteriorFaceIntegrator(
+        mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta))
+    )
+    a.AddBdrFaceIntegrator(
+        mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)),
+        dir_bdr1,
+    )
     a.AddInteriorFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta))
     a.AddBdrFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta), dir_bdr2)
     a.Assemble()
@@ -61,11 +69,25 @@ def Bilinear_Form(fes, v_coeff1, v_coeff2, xs_t_coeff, dir_bdr1, dir_bdr2, alpha
     return A
 
 
-def Linear_Form(fes, q_coeff, inflow_coeff, v_coeff1, v_coeff2, dir_bdr1, dir_bdr2, alpha = 1.0, beta = 0.5):
+def Linear_Form(
+    fes,
+    q_coeff,
+    inflow_coeff,
+    v_coeff1,
+    v_coeff2,
+    dir_bdr1,
+    dir_bdr2,
+    alpha=1.0,
+    beta=0.5,
+):
     b = mfem.LinearForm(fes)
     b.AddDomainIntegrator(mfem.DomainLFIntegrator(q_coeff))
-    b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff1, -alpha, -beta), dir_bdr1)
-    b.AddBdrFaceIntegrator(mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff2, -alpha, -beta), dir_bdr2)
+    b.AddBdrFaceIntegrator(
+        mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff1, -alpha, -beta), dir_bdr1
+    )
+    b.AddBdrFaceIntegrator(
+        mfem.BoundaryFlowIntegrator(inflow_coeff, v_coeff2, -alpha, -beta), dir_bdr2
+    )
     b.Assemble()
 
     return b
@@ -83,7 +105,9 @@ def Mass_Matrix(fes, coefficient, *, positive=False):
             value = coefficient.Eval(transformation, point)
             if not np.isfinite(value) or value < 0.0 or (positive and value == 0.0):
                 bound = "positive" if positive else "nonnegative"
-                raise ValueError(f"Mass coefficient must be finite and {bound} at integration points.")
+                raise ValueError(
+                    f"Mass coefficient must be finite and {bound} at integration points."
+                )
     form = mfem.BilinearForm(fes)
     form.AddDomainIntegrator(mfem.MassIntegrator(coefficient))
     form.Assemble()
@@ -131,4 +155,3 @@ def GFP2_Matrix(transport, L, mass_alpha, mass_beta, mass0):
     matrix = blocks.CreateMonolithic()
     matrix.thisown = True
     return matrix
-

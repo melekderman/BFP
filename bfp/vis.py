@@ -4,15 +4,15 @@ import numpy as np
 from glvis import glvis
 from mfem.ser import socketstream
 
-
 __all__ = [
-    'GlVis_Visualizer',
-    'Matplotlib_Visualizer',
-    'Mesh_Report',
-    'GlVis_2D',
-    'GlVis_3D',
-    'visualize_sol',
-    ]
+    "GlVis_Visualizer",
+    "Matplotlib_Visualizer",
+    "Mesh_Report",
+    "GlVis_2D",
+    "GlVis_3D",
+    "visualize_sol",
+]
+
 
 def GlVis_Visualizer(mesh, solution, title="CSDA Transport Solution"):
     """Visualize the solution using GLVis.
@@ -51,7 +51,7 @@ def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
     if nodes.Size() == 0:
         print("Mesh has no nodes; cannot plot.")
         return
-    
+
     # nodes is a mfem.Matrix with dimensions (dim x num_nodes).
     dim = nodes.Width()
     num_nodes = nodes.Height()
@@ -64,14 +64,14 @@ def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
 
     # Get solution values at nodes.
     sol = np.array([solution.GetValue(i) for i in range(num_nodes)])
-    
+
     # Create a scatter plot.
     plt.figure()
-    sc = plt.scatter(x_coords, E_values, c=sol, cmap='viridis')
-    plt.xlabel('x')
-    plt.ylabel('Energy (MeV)')
+    sc = plt.scatter(x_coords, E_values, c=sol, cmap="viridis")
+    plt.xlabel("x")
+    plt.ylabel("Energy (MeV)")
     plt.title(title)
-    plt.colorbar(sc, label='Flux')
+    plt.colorbar(sc, label="Flux")
     plt.show()
 
 
@@ -129,20 +129,30 @@ def Mesh_Report(mesh, width=600, height=600, num_vertices_to_print=None):
 
 
 def GlVis_2D(mesh, solution):
-    g = glvis((mesh, solution), 500,500, keys='aRjLGmcbp')
+    g = glvis((mesh, solution), 500, 500, keys="aRjLGmcbp")
     g.set_size(1000, 1000)
     g.render()
+
 
 def GlVis_3D(mesh, solution):
-    g = glvis((mesh, solution), 500,500, keys='ArljmGac//0./')
+    g = glvis((mesh, solution), 500, 500, keys="ArljmGac//0./")
     g.set_size(1000, 1000)
     g.render()
 
-    # This function was taken from the PyMFEM 
+    # This function was taken from the PyMFEM
+
+
 # https://github.com/mfem/PyMFEM/blob/06e1efa9b0bc5bc5a13246e2e73d85badecf60ad/miniapps/gslib/field_diff.py#L174
-def visualize_sol(sol, mesh, dim, title: str = "Mesh and solution",
-                    vishost: str = "localhost", visport: int = 19916,
-                    geometry: str = "0 0 600 600", keys: str = "ArljmGac//0./"):
+def visualize_sol(
+    sol,
+    mesh,
+    dim,
+    title: str = "Mesh and solution",
+    vishost: str = "localhost",
+    visport: int = 19916,
+    geometry: str = "0 0 600 600",
+    keys: str = "ArljmGac//0./",
+):
     sol_sock = socketstream("localhost", 19916)
     sol_sock.precision(8)
     sol_sock << "solution\n" << mesh << x

@@ -73,9 +73,10 @@ jobs:
         include-hidden-files: true
         if-no-files-found: error
 
-  publish-coverage:
+  publish-badges:
     needs: unit-tests
     if: >-
+      !cancelled() &&
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
@@ -96,26 +97,50 @@ jobs:
         if [ "$(git rev-parse HEAD)" = "$GITHUB_SHA" ]; then
           echo "publish=true" >> "$GITHUB_OUTPUT"
         else
-          echo "Branch advanced; skipping outdated coverage badge."
+          echo "Branch advanced; skipping outdated badge updates."
         fi
 
-    - name: Download coverage badge
+    - name: Point the test badge to this branch
       if: steps.current.outputs.publish == 'true'
+      run: |
+        python3 - <<'PY'
+        import os
+        import re
+        from pathlib import Path
+        from urllib.parse import urlencode
+
+        branch = os.environ["GITHUB_REF_NAME"]
+        workflow = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/unit_tests.yml"
+        image = workflow + "/badge.svg?" + urlencode({"branch": branch, "event": "push"})
+        target = workflow + "?" + urlencode({"query": f"branch:{branch} event:push"})
+        readme = Path("README.md")
+        text, count = re.subn(
+            r"\[!\[Unit Tests\]\([^)]*\)\]\([^)]*\)",
+            f"[![Unit Tests]({image})]({target})",
+            readme.read_text(),
+        )
+        if count != 1:
+            raise SystemExit("Expected exactly one Unit Tests badge in README.md")
+        readme.write_text(text)
+        PY
+
+    - name: Download coverage badge
+      if: steps.current.outputs.publish == 'true' && needs.unit-tests.result == 'success'
       uses: actions/download-artifact@v4
       with:
         name: coverage-badge
         path: .github/badges
 
-    - name: Commit changed coverage badge
+    - name: Commit changed badge files
       if: steps.current.outputs.publish == 'true'
       run: |
-        git add -- .github/badges/coverage.svg
-        if git diff --cached --quiet -- .github/badges/coverage.svg; then
-          echo "Coverage badge unchanged."
+        git add -- README.md .github/badges/coverage.svg
+        if git diff --cached --quiet -- README.md .github/badges/coverage.svg; then
+          echo "Badge files unchanged."
           exit 0
         fi
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git commit -m "Update coverage badge"
+        git commit -m "Update CI badges"
         # Pushes using GITHUB_TOKEN do not trigger another push workflow.
         git push origin "HEAD:$GITHUB_REF_NAME"

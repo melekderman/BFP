@@ -1,8 +1,12 @@
 import mfem.ser as mfem
 import numpy as np
 
-__all__ = ['gauss_legendre_dirs', 'integrate_angular_flux',
-           'morel_edge_coefficients', 'build_morel_angular_operator']
+__all__ = [
+    "gauss_legendre_dirs",
+    "integrate_angular_flux",
+    "morel_edge_coefficients",
+    "build_morel_angular_operator",
+]
 
 
 def gauss_legendre_dirs(N_dir):

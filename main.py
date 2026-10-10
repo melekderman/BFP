@@ -6,11 +6,12 @@ from bfp.input import (
     problem2_input,
     problem3_input,
     problem4_input,
-    problem5_input
+    problem5_input,
 )
 
+
 def main():
-    description=(
+    description = (
         "Run a selected problem input function with customizable parameters.\n\n"
         "Available problems:\n"
         "  1: Infinite Medium: ψ = Q/σₜ\n"
@@ -30,59 +31,59 @@ def main():
     )
 
     parser = argparse.ArgumentParser(
-    description=description,
-    formatter_class=argparse.RawTextHelpFormatter
+        description=description, formatter_class=argparse.RawTextHelpFormatter
     )
 
     parser.add_argument(
-        "-p", "--problem",
+        "-p",
+        "--problem",
         type=int,
         choices=[1, 2, 3, 4, 5],
         required=True,
-        help="Problem number to run (choose 1, 2, 3, 4, or 5)."
+        help="Problem number to run (choose 1, 2, 3, 4, or 5).",
     )
     parser.add_argument(
         "--nx",
         type=int,
         default=10,
-        help="Number of cells in the x-direction (default: 10)."
+        help="Number of cells in the x-direction (default: 10).",
     )
     parser.add_argument(
-        "--nE",
-        type=int,
-        default=10,
-        help="Number of energy cells (default: 10)."
+        "--nE", type=int, default=10, help="Number of energy cells (default: 10)."
     )
     parser.add_argument(
         "--N_ang",
         type=int,
         default=2,
-        help="Number of angles for the SN method (default: 2)."
+        help="Number of angles for the SN method (default: 2).",
     )
     parser.add_argument(
         "--iter_",
         type=int,
         default=1000,
-        help="Maximum number of solver iterations (default: 1000)."
+        help="Maximum number of solver iterations (default: 1000).",
     )
     parser.add_argument(
-        "--tol",
-        type=float,
-        default=1e-12,
-        help="Solver tolerance (default: 1e-12)."
+        "--tol", type=float, default=1e-12, help="Solver tolerance (default: 1e-12)."
     )
     parser.add_argument(
         "--p_level",
         type=int,
         default=1,
-        help="Print level (1 for verbose, 0 for silent; default: 1)."
+        help="Print level (1 for verbose, 0 for silent; default: 1).",
     )
-    
+
     args = parser.parse_args()
-    problem_kwargs = dict(nx=args.nx, nE=args.nE, N_ang=args.N_ang,
-                          iter_=args.iter_, tol=args.tol, p_level=args.p_level,
-                          return_info=True)
-    
+    problem_kwargs = dict(
+        nx=args.nx,
+        nE=args.nE,
+        N_ang=args.N_ang,
+        iter_=args.iter_,
+        tol=args.tol,
+        p_level=args.p_level,
+        return_info=True,
+    )
+
     if args.problem == 1:
         _, info = problem1_input(**problem_kwargs)
     elif args.problem == 2:
@@ -97,12 +98,17 @@ def main():
         print("Selected problem is not exist.")
         return
 
-    failed = [entry['mu'] for entry in info if not entry['converged']]
+    failed = [entry["mu"] for entry in info if not entry["converged"]]
     if failed:
-        print(f"Problem {args.problem}: GMRES did not converge for {len(failed)} "
-              "angular direction(s). Saved results are unconverged.")
+        print(
+            f"Problem {args.problem}: GMRES did not converge for {len(failed)} "
+            "angular direction(s). Saved results are unconverged."
+        )
     else:
-        print(f"Problem {args.problem}: GMRES converged for all angular directions. Results saved.")
+        print(
+            f"Problem {args.problem}: GMRES converged for all angular directions. Results saved."
+        )
+
 
 if __name__ == "__main__":
     main()

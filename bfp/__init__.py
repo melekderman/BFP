@@ -8,119 +8,116 @@ solvers, and visualization.
 
 __version__ = "0.0.1"
 
-from .mesh import (create_2D_mesh,
-                   create_3D_mesh
-)
+from .mesh import create_2D_mesh, create_3D_mesh
 
 from .angular import gauss_legendre_dirs
 
-from .utils import (read_data,
-                    FiniteDiffDerivative,
-                    gridfunction_to_array,
-                    assign_boundary_attributes,
-                    get_marker_for_mu,
-                    save_angular_flux,
+from .utils import (
+    read_data,
+    FiniteDiffDerivative,
+    gridfunction_to_array,
+    assign_boundary_attributes,
+    get_marker_for_mu,
+    save_angular_flux,
 )
 
-from .coeff import (TotalXSCoefficientE,
-                    ScatteringXSCoefficientE,
-                    StoppingPowerCoefficientE,
-                    QCoefficientE,
-                    QFuncCoefficient,
-                    EDependentCoefficient,
-                    XDependentCoefficient,
-                    InflowCoefficient,
-                    ConstantCoefficient,
-                    VectorConstCoefficient,
-                    gfp2_coefficients,
+from .coeff import (
+    TotalXSCoefficientE,
+    ScatteringXSCoefficientE,
+    StoppingPowerCoefficientE,
+    QCoefficientE,
+    QFuncCoefficient,
+    EDependentCoefficient,
+    XDependentCoefficient,
+    InflowCoefficient,
+    ConstantCoefficient,
+    VectorConstCoefficient,
+    gfp2_coefficients,
 )
 
-from .solver import (GMRES_solver,
-                     Initial_Guess,
-                     Solve_Phi,
-                     Solve_Psi,
-                     Solve_FP,
-                     Solve_GFP2,
+from .solver import (
+    GMRES_solver,
+    Initial_Guess,
+    Solve_Phi,
+    Solve_Psi,
+    Solve_FP,
+    Solve_GFP2,
 )
 
-from .assemble import (BoundaryConditions,
-                       FESpace,
-                       UniformRefinement,
-                       Bilinear_Form,
-                       Linear_Form,
+from .assemble import (
+    BoundaryConditions,
+    FESpace,
+    UniformRefinement,
+    Bilinear_Form,
+    Linear_Form,
 )
 
-from .vis import (GlVis_Visualizer,
-                  Matplotlib_Visualizer,
-                  Mesh_Report,
-                  GlVis_2D,
-                  GlVis_3D,
-                  visualize_sol,
+from .vis import (
+    GlVis_Visualizer,
+    Matplotlib_Visualizer,
+    Mesh_Report,
+    GlVis_2D,
+    GlVis_3D,
+    visualize_sol,
 )
 
-from .input import (problem1_input,
-                   problem2_input,
-                   problem3_input,
-                   problem4_input,
-                   problem5_input,
+from .input import (
+    problem1_input,
+    problem2_input,
+    problem3_input,
+    problem4_input,
+    problem5_input,
 )
 
 __all__ = [
     # mesh.py
-    'create_2D_mesh',
-    'create_3D_mesh',
-
+    "create_2D_mesh",
+    "create_3D_mesh",
     # angular.py
-    'gauss_legendre_dirs',
-
+    "gauss_legendre_dirs",
     # utils.py
-    'read_data',
-    'FiniteDiffDerivative',
-    'gridfunction_to_array',
-    'assign_boundary_attributes',
-    'get_marker_for_mu',
-    'save_angular_flux',
-
+    "read_data",
+    "FiniteDiffDerivative",
+    "gridfunction_to_array",
+    "assign_boundary_attributes",
+    "get_marker_for_mu",
+    "save_angular_flux",
     # coeff.py
-    'TotalXSCoefficientE',
-    'ScatteringXSCoefficientE',
-    'StoppingPowerCoefficientE',
-    'QCoefficientE',
-    'QFuncCoefficient',
-    'EDependentCoefficient',
-    'XDependentCoefficient',
-    'InflowCoefficient',
-    'ConstantCoefficient',
-    'VectorConstCoefficient',
-    'gfp2_coefficients',
-
+    "TotalXSCoefficientE",
+    "ScatteringXSCoefficientE",
+    "StoppingPowerCoefficientE",
+    "QCoefficientE",
+    "QFuncCoefficient",
+    "EDependentCoefficient",
+    "XDependentCoefficient",
+    "InflowCoefficient",
+    "ConstantCoefficient",
+    "VectorConstCoefficient",
+    "gfp2_coefficients",
     # vis.py
-    'GlVis_Visualizer',
-    'Matplotlib_Visualizer',
-    'Mesh_Report',
-    'GlVis_2D',
-    'GlVis_3D',
-    'visualize_sol',
-
+    "GlVis_Visualizer",
+    "Matplotlib_Visualizer",
+    "Mesh_Report",
+    "GlVis_2D",
+    "GlVis_3D",
+    "visualize_sol",
     # solver.py
-    'GMRES_solver',
-    'Initial_Guess',
-    'Solve_Phi',
-    'Solve_Psi',
-    'Solve_FP',
-    'Solve_GFP2',
-
+    "GMRES_solver",
+    "Initial_Guess",
+    "Solve_Phi",
+    "Solve_Psi",
+    "Solve_FP",
+    "Solve_GFP2",
     # assemble.py
-    'BoundaryConditions',
-    'FESpace',
-    'UniformRefinement',
-    'Bilinear_Form',
-    'Linear_Form',
-
+    "BoundaryConditions",
+    "FESpace",
+    "UniformRefinement",
+    "Bilinear_Form",
+    "Linear_Form",
     # input.py
-    'problem1_input',
-    'problem2_input',   
-    'problem3_input',
-    'problem4_input',
-    'problem5_input',
-    ]
+    "problem1_input",
+    "problem2_input",
+    "problem3_input",
+    "problem4_input",
+    "problem5_input",
+]
