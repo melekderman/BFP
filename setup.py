@@ -49,29 +49,26 @@ class CustomInstallCommand(install):
         for dep in dependencies:
             subprocess.check_call([sys.executable, "-m", "pip", "install", dep])
 
-        # PyMFEM
-        pymfem_dir = os.path.join(cwd, "PyMFEM")
-        if os.path.exists(pymfem_dir):
-            print("PyMFEM directory already exists. Skipping clone...")
+        # PyMFEM source build is only needed for explicit parallel installation.
+        if PARALLEL:
+            pymfem_dir = os.path.join(cwd, "PyMFEM")
+            if os.path.exists(pymfem_dir):
+                print("PyMFEM directory already exists. Skipping clone...")
 
-        print("Cloning PyMFEM repository...")
-        subprocess.check_call(["git", "clone", "https://github.com/melekderman/PyMFEM.git", pymfem_dir])
+            print("Cloning PyMFEM repository...")
+            subprocess.check_call(["git", "clone", "https://github.com/melekderman/PyMFEM.git", pymfem_dir])
 
-        os.chdir(pymfem_dir)
-        try:
-            if PARALLEL:
+            os.chdir(pymfem_dir)
+            try:
                 print("Installing PyMFEM (parallel mode)...")
                 subprocess.check_call([sys.executable, "setup.py", "install", "--with-parallel"])
-            else:
-                print("Installing PyMFEM (serial mode)...")
-                subprocess.check_call([sys.executable, "setup.py", "install"])
-        except subprocess.CalledProcessError as e:
-            print("PyMFEM installation failed:", e)
-            sys.exit(1)
-        finally:
-            os.chdir(cwd)
-            print("Cleaning up PyMFEM directory...")
-            shutil.rmtree(pymfem_dir)
+            except subprocess.CalledProcessError as e:
+                print("PyMFEM installation failed:", e)
+                sys.exit(1)
+            finally:
+                os.chdir(cwd)
+                print("Cleaning up PyMFEM directory...")
+                shutil.rmtree(pymfem_dir)
 
         # PyGLVis
         pyglvis_dir = os.path.join(cwd, "PyGLVis")
@@ -105,6 +102,7 @@ setup(
     long_description=open("README.md", encoding="utf-8").read() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
     install_requires=[
+    "mfem==4.7.0.1",
     "numpy>=1.20.0,<2.0.0",
     "numba",
     "numba-scipy",
