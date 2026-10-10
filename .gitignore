@@ -41,6 +41,7 @@ tests/unit/mesh/
 .version-release/
 
 # Cache folder
+.venv/
 bfp/__pycache__/
 *.__pycache__
 *.pyc

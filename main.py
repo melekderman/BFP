@@ -14,7 +14,7 @@ def main():
         "Run a selected problem input function with customizable parameters.\n\n"
         "Available problems:\n"
         "  1: Infinite Medium: ψ = Q/σₜ\n"
-        "  2: Exponential Attenuation: ψ(x) = Q/σₜ + ψₗ * exp(-σₜ * x / μ)\n"
+        "  2: Spatial attenuation with a constant source (S = 0)\n"
         "  3: MMS - Linear in x: ψ = a + b * x\n"
         "  4: MMS - Linear in E: ψ = a + b * E\n"
         "  5: Mixed: ψ = a + b * xE\n\n"

@@ -1,7 +1,7 @@
-mesh Module
-===========
+bfp.mesh module
+===============
 
-.. automodule:: mesh
+.. automodule:: bfp.mesh
    :members:
    :undoc-members:
    :show-inheritance:

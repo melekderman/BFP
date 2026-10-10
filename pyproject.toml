@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bfp-transport"
 dynamic = ["version"]
-description = "Boltzmann Fokker-Planck charged-particle transport using PyMFEM"
+description = "CSDA, Fokker-Planck and GFP2 charged-particle transport using PyMFEM"
 readme = "README.md"
 requires-python = ">=3.9,<3.12"
 license = "BSD-3-Clause"
@@ -31,7 +31,7 @@ classifiers = [
 
 [project.urls]
 Repository = "https://github.com/melekderman/BFP"
-Documentation = "https://melekderman.github.io/BFP/"
+Documentation = "https://github.com/melekderman/BFP/blob/main/README.md"
 
 [project.scripts]
 bfp = "main:main"

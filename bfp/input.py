@@ -78,7 +78,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, r
 
 def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
-    Executes Problem 2: S=0 Problem,  ψ(x) = ψₗ * exp(-σₜ * x / μ).
+    Executes Problem 2: spatial attenuation with a constant source and S=0.
 
     Args:
         nx (int): Number of cells in the x-direction.
@@ -103,7 +103,7 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, r
     alpha = 1.0
     beta = 0.5
 
-    # Problem 2: ψ(x) = Q/σₜ + ψₗ * exp(-σₜ * x / μ) 
+    # Problem 2: spatial attenuation with a constant source and S=0.
     pn = 2
     inflow = 10.0
     S_const = 0.0

@@ -1,11 +1,7 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: BFP
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this software, please cite the archived Zenodo release identified below. Its version and date refer to that release, not the current development package.
 type: software
 authors:
   - given-names: Melek
@@ -23,28 +19,11 @@ identifiers:
     description: The URL of version 0.1.1 of the software
 repository-code: 'https://github.com/melekderman/BFP.git'
 abstract: >-
-  Note: This project is currently under development and
-  solves the Boltzmann equation with energy–spatial coupling
-  under the Continuous Slowing Down (CSD) approximation. To
-  achieve the software’s ultimate objectives, I am now
-  focusing on adding the Fokker–Planck scattering term.
-
-
-  BFP provides a solver for Boltzman Fokker-Plank
-  charged-particle transport problems, seamlessly
-  integrating with: PyMFEM: Python wrapper for MFEM library,
-  supporting FEM simulations. PyGLVis. Interactive
-  visualization tool for finite element methods, designed
-  especially for Jupyter notebooks.
-
-
-  This package simplifies setup and visualization of BFP
-  simulations, designed specifically for Charged Particle
-  Transport Problems.
+  BFP is a research software platform for developing and evaluating computational methods for strongly forward-peaked charged-particle transport, including angular scattering models, numerical discretizations, and scalable solution algorithms. The current development implementation supports deterministic CSDA, Fokker–Planck–CSDA, and GFP2–CSDA transport in slab geometry using a coupled spatial–energy discontinuous Galerkin discretization and serial PyMFEM. MPI and GPU transport solvers remain future development goals; the archived v0.1.1 release cited above predates these current features.
 keywords:
-  - Boltzman Equation
-  - ' Fokker-Plank'
-  - ' Fokker Plank'
+  - Boltzmann Equation
+  - Fokker-Planck
+  - Generalized Fokker-Planck
   - Charged Particle Transport
   - Radiation Transport
   - Particle Transport

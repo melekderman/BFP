@@ -12,21 +12,15 @@
 
 import os, sys
 
-sys.path.insert(0, os.path.abspath('../../bfp'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-# On Read the Docs, need to mock any python packages that would require c
-from unittest.mock import MagicMock
-
-MOCK_MODULES = [
-    "matplotlib.pyplot",
-    "mfem",
-    "pyglvis",
-]
+# Build API documentation without installing the numerical backend.
+autodoc_mock_imports = ["mfem", "numpy", "matplotlib", "h5py", "glvis"]
 
 # -- Project information -----------------------------------------------------
 
 project = 'BFP'
-project_copyright_info = '2025, Melek Derman'
+copyright = '2025, Melek Derman'
 author = 'Melek Derman'
 release = 'v0.0.1'
 
@@ -51,7 +45,7 @@ extensions = ["sphinx.ext.autodoc",
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.11', None)
     # 'PyMFEM': ('https://github.com/mfem/PyMFEM', None),
-    # 'pyglvis': ('https://github.com/GLVis/pyglvis', None),
+    # 'glvis': ('https://github.com/GLVis/pyglvis', None),
 }
 
 autosummary_generate = True
@@ -60,7 +54,7 @@ napoleon_google_docstring = True
 
 github_username = "melekderman"
 github_repository = "BFP"
-github_url = "https://github.com/{github_username}/{github_repository}"
+github_url = f"https://github.com/{github_username}/{github_repository}"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -83,4 +77,4 @@ html_theme = "classic"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = []
