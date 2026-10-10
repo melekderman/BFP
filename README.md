@@ -1,6 +1,6 @@
 # Boltzmann Fokker–Planck Charged-Particle Transport (BFP)
 
-[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE) [![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml) [![Coverage](badges/coverage.svg)](badges/coverage.svg) [![Documentation](https://img.shields.io/badge/docs-source-blue)](docs/source/)
+[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE) [![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml) [![Coverage](.github/badges/coverage.svg)](.github/badges/coverage.svg) [![Documentation](https://img.shields.io/badge/docs-source-blue)](docs/source/)
 
 ## Overview
 
