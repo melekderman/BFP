@@ -12,11 +12,12 @@ import numpy as np
 from bfp import gauss_legendre_dirs
 from bfp.angular import (gauss_legendre_dirs as angular_dirs, integrate_angular_flux,
                          morel_edge_coefficients, build_morel_angular_operator)
-from bfp.assemble import BoundaryConditions, FESpace, Bilinear_Form, Linear_Form
-from bfp.coeff import VectorConstCoefficient
+from bfp.assemble import (BoundaryConditions, FESpace, Bilinear_Form, Linear_Form,
+                          Mass_Matrix, GFP2_Matrix)
+from bfp.coeff import VectorConstCoefficient, gfp2_coefficients
 from bfp.input import problem1_input, problem2_input, problem3_input, problem4_input, problem5_input
 from bfp.mesh import create_2D_mesh
-from bfp.solver import Solve_Psi, Solve_Phi, GMRES_solver, Initial_Guess
+from bfp.solver import Solve_Psi, Solve_Phi, Solve_FP, Solve_GFP2, GMRES_solver, Initial_Guess
 from bfp.utils import gauss_legendre_dirs as legacy_dirs
 from main import main
 
@@ -111,6 +112,128 @@ class TestProblems(unittest.TestCase):
                 for warning in caught:
                     self.assertIs(warning.category, RuntimeWarning)
                     self.assertIn('GMRES did not converge', str(warning.message))
+
+    def test_fp_zero_scattering(self):
+        mesh = mfem.Mesh(2, 3, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        mu, weights = angular_dirs(4)
+        markers = BoundaryConditions(mesh)
+        c = mfem.ConstantCoefficient
+        legacy = Solve_Psi(5, mu, weights, mesh, fes, c(2.0), 2.0, c(1.0), 1.0,
+                           1.0, 0.5, *markers, 1.0, 2.0, p_level=0,
+                           q_coeff=c(3.0), visualize=False, save=False)
+        flux, info = Solve_FP(mu, weights, mesh, fes, absorption_coeff=c(2.0),
+                              transport_coeff=c(0.0), S_coeff=c(1.0), q_coeff=c(3.0),
+                              inflow=c(1.0), dir_bdr1=markers[0], dir_bdr2=markers[1],
+                              p_level=0, visualize=False, save=False, return_info=True)
+        self.assertTrue(info['converged'])
+        self.assertLess(info['relative_true_residual'], 1e-10)
+        for (_, _, old), (_, _, new) in zip(legacy, flux):
+            np.testing.assert_allclose(old.GetDataArray(), new.GetDataArray(), atol=1e-10, rtol=1e-10)
+
+    def test_fp_gfp2_variable_coefficient_mms(self):
+        mesh = mfem.Mesh(2, 2, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(2, mesh)
+        mu, weights = angular_dirs(4)
+        markers = BoundaryConditions(mesh)
+        h = lambda x: 1.0 + x[0] + x[1]
+        stopping = lambda x: 1.0 + x[1]
+        absorption = lambda x: 1.0 + 0.1 * x[0]
+        alpha = lambda x: 0.6 + 0.1 * x[0] + 0.2 * x[1]
+        beta = lambda x: 0.1 + 0.05 * (x[0] + x[1])
+        for solve in (Solve_FP, Solve_GFP2):
+            with self.subTest(solve=solve.__name__):
+                b = (lambda x: 0.0) if solve is Solve_FP else beta
+                db = 0.0 if solve is Solve_FP else 0.05
+                exact, sources = [], []
+                for m in mu:
+                    exact.append(AnalyticCoefficient(
+                        lambda x, m=m: h(x) * (2.0 + (1.0 + 2.0 * b(x)) * m)))
+                    sources.append(AnalyticCoefficient(lambda x, m=m:
+                        (m - stopping(x)) * (2.0 + (1.0 + 2.0 * b(x)) * m + 2.0 * db * m * h(x))
+                        + (absorption(x) - 1.0) * h(x) * (2.0 + (1.0 + 2.0 * b(x)) * m)
+                        + 2.0 * alpha(x) * m * h(x)))
+                scattering = (dict(transport_coeff=AnalyticCoefficient(lambda x: 2.0 * alpha(x)))
+                              if solve is Solve_FP else
+                              dict(alpha_coeff=AnalyticCoefficient(alpha), beta_coeff=AnalyticCoefficient(beta)))
+                flux, info = solve(mu, weights, mesh, fes, **scattering,
+                                    absorption_coeff=AnalyticCoefficient(absorption),
+                                    S_coeff=AnalyticCoefficient(stopping), q_coeff=sources, inflow=exact,
+                                    dir_bdr1=markers[0], dir_bdr2=markers[1],
+                                    p_level=0, visualize=False, save=False, return_info=True)
+                self.assertTrue(info['converged'])
+                self.assertLess(info['relative_true_residual'], 1e-10)
+                for (_, _, psi), analytic in zip(flux, exact):
+                    self.assertLess(psi.ComputeL2Error(analytic), 1e-9)
+                phi = Solve_Phi(fes, flux, save=False)
+                self.assertLess(phi.ComputeL2Error(AnalyticCoefficient(lambda x: 4.0 * h(x))), 1e-9)
+
+    def test_gfp2_schur_complement_and_fp_limit(self):
+        mesh = mfem.Mesh(1, 1, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        mu, weights = angular_dirs(4)
+        L = build_morel_angular_operator(mu, weights)
+        c = mfem.ConstantCoefficient
+        mass = Mass_Matrix(fes, c(1.0))
+        transport = [Bilinear_Form(fes, VectorConstCoefficient(m, 0.0),
+                                  VectorConstCoefficient(0.0, -1.0), c(1.0),
+                                  *BoundaryConditions(mesh)) for m in mu]
+        a, b = gfp2_coefficients(0.8, 1.6)
+        K = a * np.linalg.solve(np.eye(4) - b * L, L)
+        matrix = GFP2_Matrix(transport, L, Mass_Matrix(fes, c(a)), Mass_Matrix(fes, c(b)), mass)
+        dense_matrix = matrix.ToDenseMatrix()
+        dense = dense_matrix.GetDataArray()
+        size = 4 * fes.GetVSize()
+        schur = dense[:size, :size] - dense[:size, size:] @ np.linalg.solve(
+            dense[size:, size:], dense[size:, :size])
+        dense_mass = mass.ToDenseMatrix()
+        expected = dense[:size, :size] - np.kron(K, dense_mass.GetDataArray())
+        np.testing.assert_allclose(schur, expected, atol=1e-14, rtol=1e-14)
+
+        common = dict(absorption_coeff=c(1.0), S_coeff=c(1.0), q_coeff=c(2.0),
+                      inflow=[c(1.0 + m) for m in mu],
+                      dir_bdr1=BoundaryConditions(mesh)[0], dir_bdr2=BoundaryConditions(mesh)[1],
+                      visualize=False, save=False, p_level=0)
+        fp = Solve_FP(mu, weights, mesh, fes, transport_coeff=c(0.8), **common)
+        errors = []
+        for b in (1e-2, 1e-4, 0.0):
+            flux = Solve_GFP2(mu, weights, mesh, fes, alpha_coeff=c(0.4 * (1.0 + 2.0 * b)),
+                              beta_coeff=c(b), **common)
+            errors.append(max(np.max(np.abs(p.GetDataArray() - f.GetDataArray()))
+                              for (_, _, p), (_, _, f) in zip(fp, flux)))
+        self.assertLess(errors[1], errors[0] / 50.0)
+        self.assertLess(errors[2], 1e-10)
+
+    def test_gfp2_angular_properties_and_coefficients(self):
+        a, b = gfp2_coefficients(0.8, 1.6)
+        self.assertGreater(a, 0.0)
+        self.assertGreaterEqual(b, 0.0)
+        for N in (2, 4, 8, 16):
+            mu, weights = np.polynomial.legendre.leggauss(N)
+            L = build_morel_angular_operator(mu, weights)
+            K = a * np.linalg.solve(np.eye(N) - b * L, L)
+            np.testing.assert_allclose(K @ np.ones(N), 0.0, atol=1e-13)
+            np.testing.assert_allclose(weights @ K, 0.0, atol=1e-13)
+            np.testing.assert_allclose(K @ mu, -0.8 * mu, atol=1e-13)
+            eig = np.linalg.eigvals(K)
+            self.assertLess(np.max(eig.real), 1e-13)
+            self.assertLess(np.max(np.abs(eig.imag)), 1e-13)
+        for first, second in ((0.0, 0.0), (-1.0, 2.0), (1.0, 1.0),
+                              (1.0, 0.5), (1.0, 4.0), (np.nan, 2.0)):
+            with self.assertRaises(ValueError):
+                gfp2_coefficients(first, second)
+        self.assertEqual(gfp2_coefficients(1.0, 3.0), (0.5, 0.0))
+        mesh = mfem.Mesh(1, 1, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        for value, positive in ((-0.1, False), (0.0, True), (np.inf, True)):
+            with self.assertRaises(ValueError):
+                Mass_Matrix(fes, mfem.ConstantCoefficient(value), positive=positive)
+        c = mfem.ConstantCoefficient
+        with self.assertRaisesRegex(ValueError, "GSSmoother requires nonzero diagonal"):
+            Solve_GFP2(*angular_dirs(3), mesh, fes, absorption_coeff=c(0.0),
+                       alpha_coeff=c(0.5), beta_coeff=c(0.1), S_coeff=c(0.0),
+                       q_coeff=c(1.0), inflow=c(0.0), dir_bdr1=BoundaryConditions(mesh)[0],
+                       dir_bdr2=BoundaryConditions(mesh)[1], visualize=False, save=False, p_level=0)
 
     def test_angle_diagnostics_and_cli(self):
         for limit, converged in ((1000, True), (1, False)):

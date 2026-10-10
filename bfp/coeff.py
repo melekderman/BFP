@@ -4,6 +4,7 @@ import mfem.ser as mfem
 import numpy as np
 
 __all__ = [
+    'gfp2_coefficients',
     'TotalXSCoefficientE',
     'ScatteringXSCoefficientE',
     'StoppingPowerCoefficientE',
@@ -15,6 +16,21 @@ __all__ = [
     'ConstantCoefficient',
     'VectorConstCoefficient',
     ]
+
+def gfp2_coefficients(sigma_a1, sigma_a2):
+    """Map elastic angular relaxation cross sections (not absorption) to alpha, beta."""
+    sigma_a1 = np.asarray(sigma_a1, dtype=float)
+    sigma_a2 = np.asarray(sigma_a2, dtype=float)
+    if (not np.all(np.isfinite(sigma_a1)) or not np.all(np.isfinite(sigma_a2))
+            or np.any(sigma_a1 <= 0.0) or np.any(sigma_a2 <= sigma_a1)
+            or np.any(sigma_a2 > 3.0 * sigma_a1)):
+        raise ValueError("GFP2 requires 0 < sigma_a1 < sigma_a2 <= 3*sigma_a1.")
+    beta = (3.0 * sigma_a1 - sigma_a2) / (6.0 * (sigma_a2 - sigma_a1))
+    alpha = 0.5 * sigma_a1 * (1.0 + 2.0 * beta)
+    if not np.all(np.isfinite(alpha)) or not np.all(np.isfinite(beta)):
+        raise ValueError("GFP2 coefficients must be finite.")
+    return alpha, beta
+
 
 class TotalXSCoefficientE(mfem.PyCoefficient):
     """Coefficient class for the total macroscopic cross-section Σ_t(E). 

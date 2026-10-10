@@ -1,10 +1,14 @@
 import mfem.ser as mfem
+import numpy as np
 
 __all__ = ['BoundaryConditions',
            'FESpace',
            'UniformRefinement',
            'Bilinear_Form',
            'Linear_Form',
+           'Mass_Matrix',
+           'FP_Matrix',
+           'GFP2_Matrix',
            ]
 
 
@@ -65,4 +69,66 @@ def Linear_Form(fes, q_coeff, inflow_coeff, v_coeff1, v_coeff2, dir_bdr1, dir_bd
     b.Assemble()
 
     return b
+
+
+def Mass_Matrix(fes, coefficient, *, positive=False):
+    """Assemble a nonnegative mass coefficient, checked at integration points."""
+    for i in range(fes.GetNE()):
+        fe = fes.GetFE(i)
+        transformation = fes.GetElementTransformation(i)
+        rule = mfem.MassIntegrator.GetRule(fe, fe, transformation)
+        for j in range(rule.GetNPoints()):
+            point = rule.IntPoint(j)
+            transformation.SetIntPoint(point)
+            value = coefficient.Eval(transformation, point)
+            if not np.isfinite(value) or value < 0.0 or (positive and value == 0.0):
+                bound = "positive" if positive else "nonnegative"
+                raise ValueError(f"Mass coefficient must be finite and {bound} at integration points.")
+    form = mfem.BilinearForm(fes)
+    form.AddDomainIntegrator(mfem.MassIntegrator(coefficient))
+    form.Assemble()
+    form.Finalize()
+    matrix = form.SpMat()
+    matrix._bilinear_form = form
+    return matrix
+
+
+def _scaled_matrix(matrix, factor):
+    result = mfem.SparseMatrix(matrix)
+    result *= float(factor)
+    return result
+
+
+def FP_Matrix(transport, L, mass_tr):
+    """Angle-major blocks T_m delta_mn - L_mn M_tr/2; L already includes weights."""
+    N = len(transport)
+    offsets = mfem.intArray([m * mass_tr.Height() for m in range(N + 1)])
+    blocks = mfem.BlockMatrix(offsets)
+    for m in range(N):
+        blocks.SetBlock(m, m, mfem.Add(1.0, transport[m], -0.5 * L[m, m], mass_tr))
+        for n in (m - 1, m + 1):
+            if 0 <= n < N:
+                blocks.SetBlock(m, n, _scaled_matrix(mass_tr, -0.5 * L[m, n]))
+    matrix = blocks.CreateMonolithic()
+    # MFEM allocates a new matrix; PyMFEM 4.7 does not mark the result as owned.
+    matrix.thisown = True
+    return matrix
+
+
+def GFP2_Matrix(transport, L, mass_alpha, mass_beta, mass0):
+    """Sparse auxiliary system, ordered (psi_0,...,psi_N-1,chi_0,...,chi_N-1)."""
+    N = len(transport)
+    offsets = mfem.intArray([m * mass0.Height() for m in range(2 * N + 1)])
+    blocks = mfem.BlockMatrix(offsets)
+    for m in range(N):
+        blocks.SetBlock(m, m, transport[m])
+        blocks.SetBlock(N + m, m, _scaled_matrix(mass0, -1.0))
+        blocks.SetBlock(N + m, N + m, mfem.Add(1.0, mass0, -L[m, m], mass_beta))
+        for n in range(max(0, m - 1), min(N, m + 2)):
+            blocks.SetBlock(m, N + n, _scaled_matrix(mass_alpha, -L[m, n]))
+            if n != m:
+                blocks.SetBlock(N + m, N + n, _scaled_matrix(mass_beta, -L[m, n]))
+    matrix = blocks.CreateMonolithic()
+    matrix.thisown = True
+    return matrix
 

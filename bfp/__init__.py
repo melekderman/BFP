@@ -32,12 +32,15 @@ from .coeff import (TotalXSCoefficientE,
                     InflowCoefficient,
                     ConstantCoefficient,
                     VectorConstCoefficient,
+                    gfp2_coefficients,
 )
 
 from .solver import (GMRES_solver,
                      Initial_Guess,
                      Solve_Phi,
-                     Solve_Psi
+                     Solve_Psi,
+                     Solve_FP,
+                     Solve_GFP2,
 )
 
 from .assemble import (BoundaryConditions,
@@ -89,6 +92,7 @@ __all__ = [
     'InflowCoefficient',
     'ConstantCoefficient',
     'VectorConstCoefficient',
+    'gfp2_coefficients',
 
     # vis.py
     'GlVis_Visualizer',
@@ -103,6 +107,8 @@ __all__ = [
     'Initial_Guess',
     'Solve_Phi',
     'Solve_Psi',
+    'Solve_FP',
+    'Solve_GFP2',
 
     # assemble.py
     'BoundaryConditions',

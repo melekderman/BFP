@@ -1,12 +1,15 @@
 import warnings
 
 import mfem.ser as mfem
+import numpy as np
 from bfp import angular, assemble, vis, coeff
 
 __all__ = ['GMRES_solver',
             'Initial_Guess',
             'Solve_Phi',
             'Solve_Psi',
+            'Solve_FP',
+            'Solve_GFP2',
            ]
 
 def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
@@ -105,4 +108,97 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
 
     if return_info:
         return psi_mu_list, info_list
+    return psi_mu_list
+
+
+def Solve_FP(mu_vals, w_vals, mesh, fes, *, absorption_coeff, transport_coeff,
+             S_coeff, q_coeff, inflow, dir_bdr1, dir_bdr2,
+             iter_=1000, tol=1e-12, p_level=1,
+             visualize=True, save=True, return_info=False):
+    """Solve FP-CSDA with genuine absorption and elastic transport cross section.
+
+    Supply MFEM coefficients; q_coeff and inflow may also be per-angle lists.
+    S_coeff uses physical energy; mark both energy faces as in Solve_Psi.
+    return_info adds global GMRES diagnostics and the true coupled residual.
+    """
+    mass_tr = assemble.Mass_Matrix(fes, transport_coeff)
+    return _solve_coupled(mu_vals, w_vals, mesh, fes, absorption_coeff, S_coeff,
+                          q_coeff, inflow, dir_bdr1, dir_bdr2, mass_tr, None, None,
+                          iter_, tol, p_level, visualize, save, return_info)
+
+
+def Solve_GFP2(mu_vals, w_vals, mesh, fes, *, absorption_coeff, alpha_coeff,
+               beta_coeff, S_coeff, q_coeff, inflow, dir_bdr1, dir_bdr2,
+               iter_=1000, tol=1e-12, p_level=1,
+               visualize=True, save=True, return_info=False):
+    """Solve GFP2-CSDA with alpha > 0, beta >= 0 and an auxiliary DG variable.
+
+    Arguments/output follow Solve_FP. Coefficients may vary in (x,E); align
+    material interfaces with the mesh. chi has no independent inflow data.
+    gfp2_coefficients converts elastic relaxation cross sections to alpha,beta.
+    With S=absorption=0, use even angular order for the GSSmoother.
+    """
+    mass_alpha = assemble.Mass_Matrix(fes, alpha_coeff, positive=True)
+    mass_beta = assemble.Mass_Matrix(fes, beta_coeff)
+    mass0 = assemble.Mass_Matrix(fes, mfem.ConstantCoefficient(1.0))
+    return _solve_coupled(mu_vals, w_vals, mesh, fes, absorption_coeff, S_coeff,
+                          q_coeff, inflow, dir_bdr1, dir_bdr2, mass_alpha, mass_beta, mass0,
+                          iter_, tol, p_level, visualize, save, return_info)
+
+
+def _solve_coupled(mu_vals, w_vals, mesh, fes, absorption_coeff, S_coeff,
+                   q_coeff, inflow, dir_bdr1, dir_bdr2, mass, mass_beta, mass0,
+                   iter_, tol, p_level, visualize, save, return_info):
+    N = len(mu_vals)
+    if N == 0 or len(w_vals) != N:
+        raise ValueError("Supply matching nonempty angular directions and weights.")
+    sources = [q_coeff] * N if isinstance(q_coeff, mfem.Coefficient) else list(q_coeff)
+    inflows = [inflow] * N if isinstance(inflow, mfem.Coefficient) else list(inflow)
+    if len(sources) != N or len(inflows) != N:
+        raise ValueError("Source and inflow lists must match the angular order.")
+    L = angular.build_morel_angular_operator(mu_vals, w_vals)
+    energy_direction = coeff.VectorConstCoefficient(0.0, -1.0)
+    velocity_E = mfem.ScalarVectorProductCoefficient(S_coeff, energy_direction)
+    ndof = fes.GetVSize()
+    size = N * ndof if mass_beta is None else 2 * N * ndof
+    rhs = mfem.Vector(size)
+    rhs.Assign(0.0)
+    transport = []
+    for m, mu in enumerate(mu_vals):
+        velocity_x = coeff.VectorConstCoefficient(mu, 0.0)
+        transport.append(assemble.Bilinear_Form(
+            fes, velocity_x, velocity_E, absorption_coeff, dir_bdr1, dir_bdr2))
+        source = assemble.Linear_Form(fes, sources[m], inflows[m], velocity_x,
+                                      velocity_E, dir_bdr1, dir_bdr2)
+        rhs.GetDataArray()[m * ndof:(m + 1) * ndof] = source.GetDataArray()
+    if mass_beta is None:
+        A = assemble.FP_Matrix(transport, L, mass)
+    else:
+        A = assemble.GFP2_Matrix(transport, L, mass, mass_beta, mass0)
+    diagonal = mfem.Vector(size)
+    A.GetDiag(diagonal)
+    if np.any(diagonal.GetDataArray() == 0.0):
+        raise ValueError("GSSmoother requires nonzero diagonal entries; for GFP2 with "
+                         "S=absorption=0, use an even angular order to avoid mu=0.")
+    solution = mfem.Vector(size)
+    solution.Assign(1.0)
+    solution, info = GMRES_solver(A, rhs, solution, iter_, tol, p_level, return_info=True)
+    residual = mfem.Vector(size)
+    A.Mult(solution, residual)
+    residual -= rhs
+    info['true_residual_norm'] = residual.Norml2()
+    rhs_norm = rhs.Norml2()
+    info['relative_true_residual'] = residual.Norml2() / rhs_norm if rhs_norm else None
+
+    psi_mu_list = []
+    for m, (mu, w) in enumerate(zip(mu_vals, w_vals)):
+        psi = Initial_Guess(fes, 0.0)
+        psi.GetDataArray()[:] = solution.GetDataArray()[m * ndof:(m + 1) * ndof]
+        if visualize:
+            vis.GlVis_2D(mesh, psi)
+        if save:
+            psi.Save("psi_hs_mu_{:.3f}.gf".format(mu))
+        psi_mu_list.append((mu, w, psi))
+    if return_info:
+        return psi_mu_list, info
     return psi_mu_list
