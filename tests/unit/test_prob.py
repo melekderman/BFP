@@ -10,7 +10,8 @@ import mfem.ser as mfem
 import numpy as np
 
 from bfp import gauss_legendre_dirs
-from bfp.angular import gauss_legendre_dirs as angular_dirs, integrate_angular_flux
+from bfp.angular import (gauss_legendre_dirs as angular_dirs, integrate_angular_flux,
+                         morel_edge_coefficients, build_morel_angular_operator)
 from bfp.assemble import BoundaryConditions, FESpace, Bilinear_Form, Linear_Form
 from bfp.coeff import VectorConstCoefficient
 from bfp.input import problem1_input, problem2_input, problem3_input, problem4_input, problem5_input
@@ -59,6 +60,23 @@ class TestProblems(unittest.TestCase):
         np.testing.assert_allclose(phi.GetDataArray(), 8.0 / 3.0, rtol=0.0, atol=1e-14)
         np.testing.assert_array_equal(phi.GetDataArray(), wrapped.GetDataArray())
         self.assertEqual(os.listdir(), [])
+
+    def test_morel_angular_operator(self):
+        for N in (1, 2, 3, 4, 8, 16, 32):
+            with self.subTest(N=N):
+                mu, weights = angular_dirs(N)
+                alpha = morel_edge_coefficients(mu, weights)
+                L = build_morel_angular_operator(mu, weights)
+                self.assertEqual(alpha.shape, (N + 1,))
+                self.assertEqual(alpha[0], 0.0)
+                self.assertAlmostEqual(alpha[-1], 0.0, delta=1e-14)
+                self.assertTrue(np.all(alpha[1:-1] > 0.0))
+                np.testing.assert_allclose(L @ np.ones(N), 0.0, rtol=0.0, atol=1e-12)
+                np.testing.assert_allclose(L @ mu, -2.0 * np.asarray(mu), rtol=0.0, atol=1e-12)
+                np.testing.assert_allclose(np.asarray(weights) @ L, 0.0, rtol=0.0, atol=1e-12)
+                eigenvalues = np.linalg.eigvals(L)
+                np.testing.assert_allclose(eigenvalues.imag, 0.0, rtol=0.0, atol=1e-12)
+                self.assertLessEqual(np.max(eigenvalues.real), 1e-12)
 
     def test_gmres_diagnostics(self):
         A = mfem.SparseMatrix(4)
