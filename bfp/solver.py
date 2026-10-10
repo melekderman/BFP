@@ -1,7 +1,7 @@
 import warnings
 
 import mfem.ser as mfem
-from bfp import assemble, vis, coeff
+from bfp import angular, assemble, vis, coeff
 
 __all__ = ['GMRES_solver',
             'Initial_Guess',
@@ -45,12 +45,7 @@ def Initial_Guess(fes, psi_const):
 
 def Solve_Phi(fes, psi_mu_list, *, save=True):
     """Integrate angular flux; set save=False to skip the scalar flux file."""
-    phi = mfem.GridFunction(fes)
-    # PyMFEM 4.7 GridFunction does not retain its finite element space.
-    phi._fes = fes
-    phi.Assign(0.0)
-    for _, w, X in psi_mu_list:
-        phi.Add(w, X)
+    phi = angular.integrate_angular_flux(fes, psi_mu_list)
     if save:
         phi.Save("phi_dg.gf")
 

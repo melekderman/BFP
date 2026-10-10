@@ -2,6 +2,8 @@ import mfem.ser as mfem
 import numpy as np
 import h5py
 
+from bfp.angular import gauss_legendre_dirs
+
 
 __all__ = [
     'read_data',
@@ -38,25 +40,6 @@ def read_data(nE):
         S_arr    = f[f"S_{nE}"][:]
 
     return E_arr, E_grid_arr, xs_t_arr, xs_s_arr, S_arr
-
-
-def gauss_legendre_dirs(N_dir):
-    """Compute Gauss-Legendre quadrature points and weights for discrete ordinates.
-
-    This function computes the Gauss-Legendre quadrature points (mu_i) and weights (w_i)
-    for the specified number of discrete ordinates using NumPy's polynomial module.
-
-    Args:
-        N_dir (int): The number of discrete ordinates.
-
-    Returns:
-        tuple: A tuple containing two lists:
-            - mu (list of float): The Gauss-Legendre quadrature points.
-            - w (list of float): The corresponding Gauss-Legendre quadrature weights.
-    """
-
-    mu, w = np.polynomial.legendre.leggauss(N_dir)
-    return mu.tolist(), w.tolist()
 
 
 def FiniteDiffDerivative(E, S):

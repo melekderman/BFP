@@ -9,11 +9,14 @@ from unittest.mock import patch
 import mfem.ser as mfem
 import numpy as np
 
+from bfp import gauss_legendre_dirs
+from bfp.angular import gauss_legendre_dirs as angular_dirs, integrate_angular_flux
 from bfp.assemble import BoundaryConditions, FESpace, Bilinear_Form, Linear_Form
 from bfp.coeff import VectorConstCoefficient
 from bfp.input import problem1_input, problem2_input, problem3_input, problem4_input, problem5_input
 from bfp.mesh import create_2D_mesh
 from bfp.solver import Solve_Psi, Solve_Phi, GMRES_solver, Initial_Guess
+from bfp.utils import gauss_legendre_dirs as legacy_dirs
 from main import main
 
 
@@ -36,6 +39,26 @@ class TestProblems(unittest.TestCase):
         display = patch('bfp.vis.GlVis_2D')
         display.start()
         self.addCleanup(display.stop)
+
+    def test_angular_integration(self):
+        self.assertIs(gauss_legendre_dirs, angular_dirs)
+        self.assertIs(legacy_dirs, angular_dirs)
+        mu, weights = angular_dirs(4)
+        self.assertIsInstance(mu, list)
+        self.assertIsInstance(weights, list)
+        self.assertAlmostEqual(sum(weights), 2.0)
+        self.assertEqual(mu, sorted(mu))
+        mesh = mfem.Mesh(1, 1, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        angular = []
+        for direction, weight in zip(mu, weights):
+            psi = Initial_Guess(fes, 1.0 + direction**2)
+            angular.append((direction, weight, psi))
+        phi = integrate_angular_flux(fes, angular)
+        wrapped = Solve_Phi(fes, angular, save=False)
+        np.testing.assert_allclose(phi.GetDataArray(), 8.0 / 3.0, rtol=0.0, atol=1e-14)
+        np.testing.assert_array_equal(phi.GetDataArray(), wrapped.GetDataArray())
+        self.assertEqual(os.listdir(), [])
 
     def test_gmres_diagnostics(self):
         A = mfem.SparseMatrix(4)

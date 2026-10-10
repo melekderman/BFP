@@ -12,8 +12,9 @@ from .mesh import (create_2D_mesh,
                    create_3D_mesh
 )
 
+from .angular import gauss_legendre_dirs
+
 from .utils import (read_data,
-                    gauss_legendre_dirs,
                     FiniteDiffDerivative,
                     gridfunction_to_array,
                     assign_boundary_attributes,
@@ -66,9 +67,11 @@ __all__ = [
     'create_2D_mesh',
     'create_3D_mesh',
 
+    # angular.py
+    'gauss_legendre_dirs',
+
     # utils.py
     'read_data',
-    'gauss_legendre_dirs',
     'FiniteDiffDerivative',
     'gridfunction_to_array',
     'assign_boundary_attributes',

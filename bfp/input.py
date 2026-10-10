@@ -5,7 +5,7 @@ os.environ['DISPLAY'] = ':0'
 from bfp.mesh import create_2D_mesh
 from bfp.assemble import FESpace, BoundaryConditions
 from bfp.coeff import TotalXSCoefficientE
-from bfp.utils import gauss_legendre_dirs
+from bfp.angular import gauss_legendre_dirs
 from bfp.solver import Solve_Psi, Solve_Phi
 
 
