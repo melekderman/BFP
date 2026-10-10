@@ -293,12 +293,12 @@ class QFuncCoefficient(mfem.PyCoefficient):
         return float(self.mu_val * self.b_val + self.xs_t_val * (self.a_val + self.b_val * x[0]))
 
     def coeff_pn4(self, x):
-        return float(self.xs_t_val * (self.a_val + self.b_val * x[1]) + self.S_val * self.b_val)
+        return float(self.xs_t_val * (self.a_val + self.b_val * x[1]) - self.S_val * self.b_val)
 
     def coeff_pn5(self, x):
         sol =  self.mu_val * self.b_val * x[1] \
             + self.xs_t_val * (self.a_val + self.b_val * x[0] * x[1]) \
-            + self.S_val * self.b_val * x[0]
+            - self.S_val * self.b_val * x[0]
         return sol
 
 
@@ -426,6 +426,9 @@ class XDependentCoefficient(mfem.PyCoefficient):
 class InflowCoefficient(mfem.PyCoefficient):
     """Coefficient class for the inflow boundary condition.
 
+    For pn=3, 4, 5, evaluate the manufactured solution on the boundary;
+    a_val and b_val specify its coefficients. Flux integrators select inflow.
+
     This class represents a coefficient for the inflow boundary condition.
     The coefficient returns a specified inflow value based on the angular direction `mu` and
     optional boundary flags. If `xl` is set to True, the coefficient returns the inflow value
@@ -443,12 +446,15 @@ class InflowCoefficient(mfem.PyCoefficient):
             Defaults to None.
     """
 
-    def __init__(self, inflow, mu, xl=None, xr=None):
+    def __init__(self, inflow, mu, xl=None, xr=None, pn=None, a_val=0, b_val=0):
         super(InflowCoefficient, self).__init__()
         self.inflow = inflow
         self.mu = mu
         self.xl = xl
         self.xr = xr
+        self.pn = pn
+        self.a_val = a_val
+        self.b_val = b_val
 
     def EvalValue(self, x):
         """Evaluate the inflow coefficient.
@@ -463,6 +469,14 @@ class InflowCoefficient(mfem.PyCoefficient):
         Returns:
             float: The inflow value if the condition is met, otherwise 0.0.
         """
+
+        # MMS traces apply on each inflow face, including E_max.
+        if self.pn == 3:
+            return self.a_val + self.b_val * x[0]
+        if self.pn == 4:
+            return self.a_val + self.b_val * x[1]
+        if self.pn == 5:
+            return self.a_val + self.b_val * x[0] * x[1]
 
         if self.xl is True and self.xr is not True:
             if self.mu > 0:

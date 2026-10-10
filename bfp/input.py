@@ -165,7 +165,7 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     fes = FESpace(order, mesh)
 
     # Define boundary attributes.
-    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=0, x_max=0, y_min=1, y_max=1)
+    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1)
 
     # Set coefficients and compute SN quadratures.
     xs_t_coeff = TotalXSCoefficientE(xs_t_const, E_start, E_end)
@@ -219,7 +219,7 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     fes = FESpace(order, mesh)
 
     # Define boundary attributes.
-    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=0, x_max=0, y_min=1, y_max=1)
+    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1)
 
     # Set coefficients and compute SN quadratures.
     xs_t_coeff = TotalXSCoefficientE(xs_t_const, E_start, E_end)
@@ -272,7 +272,7 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     fes = FESpace(order, mesh)
 
     # Define boundary attributes
-    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=0, x_max=0, y_min=1, y_max=1)
+    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1)
 
     # Set coefficients and SN quadratures
     xs_t_coeff = TotalXSCoefficientE(xs_t_const, E_start, E_end)
@@ -281,7 +281,7 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: Calculate psi and then phi
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, iter_, tol, p_level)
+                                 a, b, iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi

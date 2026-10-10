@@ -24,6 +24,7 @@ def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1):
 
 def Initial_Guess(fes, psi_const):
     psi = mfem.GridFunction(fes)
+    psi._fes = fes
     psi.Assign(psi_const)
     
     return psi
@@ -31,6 +32,8 @@ def Initial_Guess(fes, psi_const):
 
 def Solve_Phi(fes, psi_mu_list):
     phi = mfem.GridFunction(fes)
+    # PyMFEM 4.7 GridFunction does not retain its finite element space.
+    phi._fes = fes
     phi.Assign(0.0)
     for _, w, X in psi_mu_list:
         phi.Add(w, X)
@@ -40,7 +43,21 @@ def Solve_Phi(fes, psi_mu_list):
 
 
 def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, 
-              alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, q_const=0, E_start=0, E_end=0, iter_=1000, tol=1e-12, p_level=1):
+              alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, q_const=0, E_start=0, E_end=0, iter_=1000, tol=1e-12, p_level=1,
+              *, S_coeff=None, q_coeff=None):
+    """Solve in physical (x, E); S_coeff overrides positive S_const.
+
+    S_coeff is a continuous MFEM scalar coefficient. For variable-S MMS,
+    supply q_coeff including -d(S*psi)/dE and the exact inflow coefficient.
+    Both energy faces must be marked: high-E inflow and low-E outflow.
+    """
+    if S_coeff is not None and pn in (3, 4, 5) and q_coeff is None:
+        raise ValueError("Variable-S manufactured solutions require q_coeff.")
+    source_coeff = q_coeff
+    if S_coeff is None:
+        S_coeff = mfem.ConstantCoefficient(S_const)
+    energy_direction = coeff.VectorConstCoefficient(0.0, -1.0)
+    v_coeff2 = mfem.ScalarVectorProductCoefficient(S_coeff, energy_direction)
 
     psi_mu = []
     psi_mu_list = []
@@ -49,10 +66,12 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
         a = a_const
         b = b_const
         print("  Solving for mu =", mu)
-        inflow_coeff = coeff.InflowCoefficient(inflow, mu)
-        v_coeff1 = coeff.VectorConstCoefficient([mu, 0.0])
-        v_coeff2 = coeff.VectorConstCoefficient([0.0, S_const])
-        if pn == 1 or pn == 2:
+        inflow_coeff = inflow if isinstance(inflow, mfem.Coefficient) else coeff.InflowCoefficient(
+            inflow, mu, pn=pn, a_val=a, b_val=b)
+        v_coeff1 = coeff.VectorConstCoefficient(mu, 0.0)
+        if source_coeff is not None:
+            q_coeff = source_coeff
+        elif pn == 1 or pn == 2:
             q_coeff = coeff.QCoefficientE(q_const, E_start, E_end)
         else:
             q_coeff = coeff.QFuncCoefficient(pn, a_val=a, b_val=b, xs_t_val=xs_t_const,
@@ -60,12 +79,13 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
 
         a = mfem.BilinearForm(fes)
         a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff1, 1.0))
-        a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff2, 1.0))
+        # Conservative energy weak form includes dS/dE without differentiating S.
+        a.AddDomainIntegrator(mfem.ConservativeConvectionIntegrator(v_coeff2, 1.0))
         a.AddDomainIntegrator(mfem.MassIntegrator(xs_t_coeff))
         a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)))
         a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)), dir_bdr1)
-        a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff2, -alpha, beta)))
-        a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff2, -alpha, beta)), dir_bdr2)
+        a.AddInteriorFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta))
+        a.AddBdrFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta), dir_bdr2)
         a.Assemble()
         a.Finalize()
         A = a.SpMat()

@@ -36,13 +36,12 @@ def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
     """Visualize the solution using matplotlib.
 
     Assumes the mesh is a structured Cartesian mesh.
-    The y-coordinate is mapped to energy using:
-         E = E_start - y*(E_start - E_end).
+    The second mesh coordinate is physical kinetic energy E.
 
     Args:
         mesh: The computational mesh.
         solution: The solution grid function.
-        E_range (tuple): (E_end, E_start) for energy mapping.
+        E_range (tuple): Retained for compatibility; coordinates are already energy.
         nx (int): Number of spatial elements.
         nE (int): Number of energy groups.
     """
@@ -61,9 +60,7 @@ def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
     x_coords = np.array([nodes.Get(i, 0) for i in range(num_nodes)])
     y_coords = np.array([nodes.Get(i, 1) for i in range(num_nodes)])
 
-    # Map y-coordinate to energy.
-    E_end, E_start = E_range
-    E_values = E_start - y_coords * (E_start - E_end)
+    E_values = y_coords
 
     # Get solution values at nodes.
     sol = np.array([solution.GetValue(i) for i in range(num_nodes)])

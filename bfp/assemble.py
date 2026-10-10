@@ -17,8 +17,8 @@ def BoundaryConditions(mesh, x_min=1, x_max=1, y_min=1, y_max=1):
 
     dir_bdr2 = mfem.intArray(mesh.bdr_attributes.Max())
     dir_bdr2.Assign(0)
-    dir_bdr2[0] = y_max
-    dir_bdr2[2] = y_min
+    dir_bdr2[0] = y_min
+    dir_bdr2[2] = y_max
 
     return dir_bdr1, dir_bdr2
 
@@ -39,17 +39,20 @@ def UniformRefinement(mesh, ref_level=0):
 
 
 def Bilinear_Form(fes, v_coeff1, v_coeff2, xs_t_coeff, dir_bdr1, dir_bdr2, alpha = 1.0, beta = 0.5):
+    """Assemble transport with energy velocity v_coeff2 = (0, -S(E))."""
     a = mfem.BilinearForm(fes)
     a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff1, 1.0))
-    a.AddDomainIntegrator(mfem.ConvectionIntegrator(v_coeff2, 1.0))
+    # Conservative energy weak form includes dS/dE without differentiating S.
+    a.AddDomainIntegrator(mfem.ConservativeConvectionIntegrator(v_coeff2, 1.0))
     a.AddDomainIntegrator(mfem.MassIntegrator(xs_t_coeff))
     a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)))
     a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff1, -alpha, beta)), dir_bdr1)
-    a.AddInteriorFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff2, -alpha, beta)))
-    a.AddBdrFaceIntegrator(mfem.TransposeIntegrator(mfem.DGTraceIntegrator(v_coeff2, -alpha, beta)), dir_bdr2)
+    a.AddInteriorFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta))
+    a.AddBdrFaceIntegrator(mfem.DGTraceIntegrator(v_coeff2, alpha, beta), dir_bdr2)
     a.Assemble()
     a.Finalize()
     A = a.SpMat()
+    A._bilinear_form = a
 
     return A
 
