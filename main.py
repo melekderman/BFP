@@ -7,18 +7,21 @@ from bfp.input import (
     problem3_input,
     problem4_input,
     problem5_input,
+    slab_input,
 )
 
 
 def main():
     description = (
         "Run a selected problem input function with customizable parameters.\n\n"
-        "Available problems:\n"
+        "CSDA problems (--model csda, the default):\n"
         "  1: Infinite Medium: ψ = Q/σₜ\n"
         "  2: Spatial attenuation with a constant source (S = 0)\n"
         "  3: MMS - Linear in x: ψ = a + b * x\n"
         "  4: MMS - Linear in E: ψ = a + b * E\n"
         "  5: Mixed: ψ = a + b * xE\n\n"
+        "FP/GFP2 problem (--model fp or --model gfp2):\n"
+        "  slab: Unit slab with constant coefficients and zero inflow\n\n"
         "The following parameters can be provided:\n"
         "  nx (int): Number of cells in the x-direction (default: 10).\n"
         "  nE (int): Number of energy cells (default: 10).\n"
@@ -27,7 +30,8 @@ def main():
         "  tol (float): Solver tolerance (default: 1e-12).\n"
         "  p_level (int): Print level (1 for verbose, 0 for silent; default: 1).\n\n"
         "Example usage:\n"
-        "  python main.py -p 4 --nx 15 --nE 12"
+        "  python main.py -p 4 --nx 15 --nE 12\n"
+        "  python main.py --model fp --problem slab --N_ang 4"
     )
 
     parser = argparse.ArgumentParser(
@@ -35,12 +39,18 @@ def main():
     )
 
     parser.add_argument(
+        "--model",
+        choices=["csda", "fp", "gfp2"],
+        default="csda",
+        help="Transport model (default: csda).",
+    )
+    parser.add_argument(
         "-p",
         "--problem",
-        type=int,
-        choices=[1, 2, 3, 4, 5],
+        type=lambda value: value if value == "slab" else int(value),
+        choices=[1, 2, 3, 4, 5, "slab"],
         required=True,
-        help="Problem number to run (choose 1, 2, 3, 4, or 5).",
+        help="CSDA: 1–5; FP/GFP2: slab.",
     )
     parser.add_argument(
         "--nx",
@@ -74,6 +84,10 @@ def main():
     )
 
     args = parser.parse_args()
+    if args.model == "csda" and args.problem == "slab":
+        parser.error("--model csda requires --problem 1, 2, 3, 4 or 5.")
+    if args.model != "csda" and args.problem != "slab":
+        parser.error(f"--model {args.model} requires --problem slab.")
     problem_kwargs = dict(
         nx=args.nx,
         nE=args.nE,
@@ -83,6 +97,17 @@ def main():
         p_level=args.p_level,
         return_info=True,
     )
+
+    if args.problem == "slab":
+        _, info = slab_input(args.model, **problem_kwargs)
+        if info["converged"]:
+            print(f"Problem slab ({args.model}): GMRES converged. Results saved.")
+        else:
+            print(
+                f"Problem slab ({args.model}): GMRES did not converge. "
+                "Saved results are unconverged."
+            )
+        return
 
     if args.problem == 1:
         _, info = problem1_input(**problem_kwargs)

@@ -1,6 +1,6 @@
 # __init__.py
 """
-Problem Package for the CSDA Transport Equation Solver using PyMFEM.
+CSDA, FP–CSDA and GFP2–CSDA slab transport using serial PyMFEM.
 
 This package contains modules for mesh generation, system assembly,
 solvers, and visualization.
@@ -42,6 +42,7 @@ from .solver import (
     Solve_Psi,
     Solve_FP,
     Solve_GFP2,
+    Solve_Transport,
 )
 
 from .assemble import (
@@ -108,6 +109,7 @@ __all__ = [
     "Solve_Psi",
     "Solve_FP",
     "Solve_GFP2",
+    "Solve_Transport",
     # assemble.py
     "BoundaryConditions",
     "FESpace",

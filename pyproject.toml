@@ -31,7 +31,7 @@ classifiers = [
 
 [project.urls]
 Repository = "https://github.com/melekderman/BFP"
-Documentation = "https://github.com/melekderman/BFP/blob/main/README.md"
+Documentation = "https://melekderman.github.io/BFP/"
 
 [project.scripts]
 bfp = "main:main"

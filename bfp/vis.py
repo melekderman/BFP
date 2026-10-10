@@ -15,12 +15,10 @@ __all__ = [
 
 
 def GlVis_Visualizer(mesh, solution, title="CSDA Transport Solution"):
-    """Visualize the solution using GLVis.
+    """Send an MFEM ``mesh`` and solution GridFunction to GLVis on localhost:19916.
 
-    Args:
-        mesh: The computational mesh.
-        solution: The solution grid function.
-        title (str): Title for the GLVis window.
+    Requires a running external GLVis server. ``title`` is the window label.
+    Prints a message if the socket connection fails; returns None.
     """
     ss = mfem.socketstream("localhost", 19916)
     if not ss.good():
@@ -33,17 +31,13 @@ def GlVis_Visualizer(mesh, solution, title="CSDA Transport Solution"):
 
 
 def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
-    """Visualize the solution using matplotlib.
+    """Legacy nodal plotting helper; not verified for general DG GridFunctions.
 
-    Assumes the mesh is a structured Cartesian mesh.
-    The second mesh coordinate is physical kinetic energy E.
-
-    Args:
-        mesh: The computational mesh.
-        solution: The solution grid function.
-        E_range (tuple): Retained for compatibility; coordinates are already energy.
-        nx (int): Number of spatial elements.
-        nE (int): Number of energy groups.
+    Assumes a structured mesh with accessible nodal coordinates and matching
+    solution values. The second coordinate is physical kinetic energy in MeV.
+    ``E_range``, ``nx`` and ``nE`` are retained but unused; ``title`` labels the
+    plot. Displays a Matplotlib figure and returns None. For current DG output,
+    prefer :func:`GlVis_2D`; this helper may fail on meshes without nodal data.
     """
 
     # Get the mesh nodes.
@@ -76,22 +70,11 @@ def Matplotlib_Visualizer(mesh, solution, E_range, nx, nE, title):
 
 
 def Mesh_Report(mesh, width=600, height=600, num_vertices_to_print=None):
-    """
-    Print mesh information and visualize the mesh using glvis.
+    """Print vertex/element counts and display an MFEM mesh with PyGLVis.
 
-    This function prints the total number of vertices and elements,
-    displays a specified number of vertex coordinates (defaulting to the first 10 if not provided),
-    and then launches the glvis visualization window with the specified dimensions.
-
-    Parameters:
-        mesh : mfem Mesh object
-            The mesh object containing vertices and elements.
-        width : int, optional
-            Width of the glvis window (default is 600).
-        height : int, optional
-            Height of the glvis window (default is 600).
-        num_vertices_to_print : int, optional
-            The number of vertex coordinates to print. If not provided, the first 10 vertices will be printed.
+    ``width`` and ``height`` are display dimensions in pixels.
+    ``num_vertices_to_print`` defaults to the first ten vertices. Rendering
+    requires a compatible notebook frontend. Returns None.
     """
     try:
         total_vertices = mesh.GetNV()
@@ -129,12 +112,22 @@ def Mesh_Report(mesh, width=600, height=600, num_vertices_to_print=None):
 
 
 def GlVis_2D(mesh, solution):
+    """Render a two-dimensional MFEM ``mesh`` and solution GridFunction with PyGLVis.
+
+    Requires a compatible notebook frontend. Uses a 1000-by-1000 display and
+    returns None. This is the visualization invoked by the transport solvers.
+    """
     g = glvis((mesh, solution), 500, 500, keys="aRjLGmcbp")
     g.set_size(1000, 1000)
     g.render()
 
 
 def GlVis_3D(mesh, solution):
+    """Render a three-dimensional MFEM ``mesh`` and solution GridFunction with PyGLVis.
+
+    Requires a compatible notebook frontend; returns None. This visualization
+    helper does not provide a three-dimensional transport solver.
+    """
     g = glvis((mesh, solution), 500, 500, keys="ArljmGac//0./")
     g.set_size(1000, 1000)
     g.render()
@@ -153,6 +146,12 @@ def visualize_sol(
     geometry: str = "0 0 600 600",
     keys: str = "ArljmGac//0./",
 ):
+    """Legacy incomplete socket helper; use GlVis_2D or GlVis_Visualizer instead.
+
+    The current body references undefined variables and does not correctly use
+    its supplied solution/connection arguments. It is retained for compatibility
+    but is not a functioning visualization entry point.
+    """
     sol_sock = socketstream("localhost", 19916)
     sol_sock.precision(8)
     sol_sock << "solution\n" << mesh << x

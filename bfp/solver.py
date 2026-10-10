@@ -1,4 +1,5 @@
 import warnings
+from inspect import signature
 
 import mfem.ser as mfem
 import numpy as np
@@ -11,11 +12,87 @@ __all__ = [
     "Solve_Psi",
     "Solve_FP",
     "Solve_GFP2",
+    "Solve_Transport",
 ]
 
 
+def Solve_Transport(
+    model,
+    *,
+    iter_=1000,
+    tol=1e-12,
+    p_level=1,
+    visualize=True,
+    save=True,
+    return_info=False,
+    **problem,
+):
+    """Select a transport model without changing its numerical solver.
+
+    Args:
+        model (str): ``"csda"``, ``"fp"`` or ``"gfp2"``, selecting
+            :func:`Solve_Psi`, :func:`Solve_FP` or :func:`Solve_GFP2`.
+        iter_ (int): Maximum GMRES iterations.
+        tol (float): Both absolute and relative GMRES tolerance.
+        p_level (int): MFEM solver print level; 0 is quiet.
+        visualize (bool): Render angular fluxes with PyGLVis.
+        save (bool): Write angular flux files.
+        return_info (bool): Include the selected solver's diagnostics.
+        **problem: The selected solver's problem arguments by keyword: mesh,
+            quadrature, coefficients, source and boundary data. No missing
+            scattering coefficients are inferred from a CSDA configuration.
+
+    Returns:
+        list or tuple: Angular fluxes, or ``(fluxes, info)`` if requested.
+        CSDA diagnostics are per angle; FP/GFP2 diagnostics describe the
+        coupled system. Direct solver return values are preserved.
+
+    Raises:
+        ValueError: The model name is unknown.
+        TypeError: Arguments are missing/unexpected or required material
+            coefficients are not MFEM scalar coefficients. These checks
+            precede assembly; value checks remain in the selected solver.
+    """
+    if model == "csda":
+        solve = Solve_Psi
+        coefficients = ("xs_t_coeff",)
+    elif model == "fp":
+        solve = Solve_FP
+        coefficients = ("absorption_coeff", "transport_coeff", "S_coeff")
+    elif model == "gfp2":
+        solve = Solve_GFP2
+        coefficients = ("absorption_coeff", "alpha_coeff", "beta_coeff", "S_coeff")
+    else:
+        raise ValueError("Unknown transport model; choose 'csda', 'fp' or 'gfp2'.")
+
+    problem.update(
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        visualize=visualize,
+        save=save,
+        return_info=return_info,
+    )
+    signature(solve).bind(**problem)
+    for name in coefficients:
+        if not isinstance(problem[name], mfem.Coefficient):
+            raise TypeError(f"{model}: {name} must be an MFEM scalar coefficient.")
+    return solve(**problem)
+
+
 def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
-    """Optionally return (psi, info), with MFEM's preconditioned residual norm."""
+    """Solve ``A psi = b`` in place with GMRES and GSSmoother.
+
+    ``A`` is an MFEM sparse matrix; ``b`` and ``psi`` are compatible MFEM
+    vectors (a GridFunction is also accepted for ``psi``). ``iter_`` limits
+    iterations, ``tol`` sets both absolute and relative tolerances, and
+    ``p_level`` controls MFEM output (0 is quiet). The restart size is 30.
+
+    Return ``psi``, or ``(psi, info)`` when ``return_info=True``. The dictionary
+    contains ``converged`` (bool), ``iterations`` (int) and ``final_norm``
+    (MFEM's preconditioned residual norm, not the true residual). Failure to
+    converge emits a RuntimeWarning and still returns the current iterate.
+    """
     prec = mfem.GSSmoother(A)
     solver = mfem.GMRESSolver()
     solver.SetOperator(A)
@@ -45,6 +122,7 @@ def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1, *, return_info=Fal
 
 
 def Initial_Guess(fes, psi_const):
+    """Return an MFEM GridFunction on ``fes`` with every DOF set to ``psi_const``."""
     psi = mfem.GridFunction(fes)
     psi._fes = fes
     psi.Assign(psi_const)
@@ -53,7 +131,11 @@ def Initial_Guess(fes, psi_const):
 
 
 def Solve_Phi(fes, psi_mu_list, *, save=True):
-    """Integrate angular flux; set save=False to skip the scalar flux file."""
+    """Return scalar flux on ``fes`` by summing ``(mu, weight, GridFunction)`` entries.
+
+    The integral is ``sum(weight * psi)`` without a factor of 1/2. With
+    ``save=True``, write ``phi_dg.gf`` in the current working directory.
+    """
     phi = angular.integrate_angular_flux(fes, psi_mu_list)
     if save:
         phi.Save("phi_dg.gf")
@@ -90,13 +172,47 @@ def Solve_Psi(
     save=True,
     return_info=False,
 ):
-    """Solve in physical (x, E); S_coeff overrides positive S_const.
+    """Solve CSDA streaming/removal independently at each angular direction.
 
-    S_coeff is a continuous MFEM scalar coefficient. For variable-S MMS,
-    supply q_coeff including -d(S*psi)/dE and the exact inflow coefficient.
-    Both energy faces must be marked: high-E inflow and low-E outflow.
-    Set visualize=False and save=False to disable GLVis and flux files.
-    With return_info=True, return (angular fluxes, per-angle diagnostics).
+    The equation is ``mu*d_x(psi) - d_E(S*psi) + Sigma_t*psi = q`` on the
+    coupled physical ``(x, E)`` DG mesh; there is no angular scattering gain.
+
+    Args:
+        pn (int): Source/inflow convention: 1–2 for prescribed source,
+            3–5 for linear-position, linear-energy or bilinear manufactured
+            solutions. Explicit coefficient overrides take precedence.
+        mu_vals, w_vals (sequence): Matching directions and quadrature weights.
+        mesh: Serial MFEM mesh with position in cm and kinetic energy in MeV.
+        fes: Scalar DG finite element space on ``mesh``.
+        xs_t_coeff: MFEM removal coefficient in inverse cm.
+        xs_t_const (float): Constant removal used to construct manufactured sources.
+        inflow: MFEM scalar boundary coefficient, or a number passed to
+            :class:`~bfp.coeff.InflowCoefficient` with ``pn``, ``a_const``, ``b_const``.
+        S_const (float): Positive stopping power in MeV/cm (0 disables CSDA).
+        alpha, beta (float): DG flux parameters, normally 1 and 0.5;
+            these are not GFP2 material coefficients.
+        dir_bdr1, dir_bdr2: Spatial and energy boundary markers from
+            :func:`~bfp.assemble.BoundaryConditions`. Mark both energy faces:
+            high-energy inflow and low-energy outflow. Spatial inflow is on
+            the left for positive mu and the right for negative mu.
+        a_const, b_const (float): Manufactured flux coefficients.
+        q_const: Source data for problems 1–2, in angular-flux units per cm.
+        E_start, E_end (float): High/low energy bounds for grouped source data.
+        iter_, tol, p_level: Iteration limit, tolerance and print level;
+            see :func:`GMRES_solver`.
+        S_coeff: Optional continuous MFEM stopping-power coefficient overriding
+            ``S_const``. The conservative weak form includes the derivative of S.
+        q_coeff: Optional MFEM source coefficient overriding the built-in source.
+            For variable-S manufactured solutions, supply the full conservative
+            source and exact boundary inflow explicitly.
+        visualize, save (bool): Render with PyGLVis and write per-angle
+            ``psi_hs_mu_*.gf`` files, respectively.
+        return_info (bool): Also return convergence diagnostics.
+
+    Returns:
+        list or tuple: ``(mu, weight, GridFunction)`` entries, or
+        ``(fluxes, info_list)``. Each info dictionary adds ``mu`` to the
+        :func:`GMRES_solver` fields. Nonconvergence warns and retains the iterate.
     """
     if S_coeff is not None and pn in (3, 4, 5) and q_coeff is None:
         raise ValueError("Variable-S manufactured solutions require q_coeff.")
@@ -184,11 +300,38 @@ def Solve_FP(
     save=True,
     return_info=False,
 ):
-    """Solve FP-CSDA with genuine absorption and elastic transport cross section.
+    """Solve coupled FP–CSDA with Morel angular differencing.
 
-    Supply MFEM coefficients; q_coeff and inflow may also be per-angle lists.
-    S_coeff uses physical energy; mark both energy faces as in Solve_Psi.
-    return_info adds global GMRES diagnostics and the true coupled residual.
+    The equation is ``mu*d_x(psi) - d_E(S*psi) + Sigma_abs*psi
+    - (Sigma_tr/2)*L*psi = q``. Elastic scattering is conservative; do not
+    include the total elastic cross section in ``absorption_coeff``.
+
+    Args:
+        mu_vals, w_vals (sequence): Increasing full-range Gauss–Legendre
+            directions and positive weights summing to 2.
+        mesh, fes: Serial MFEM mesh and scalar DG space in physical ``(x, E)``.
+        absorption_coeff: Genuine absorption, in inverse cm, as an MFEM coefficient.
+        transport_coeff: Elastic transport cross section, in inverse cm;
+            finite and nonnegative at mass-integration points.
+        S_coeff: MFEM stopping power in MeV/cm; positive for energy loss.
+            Constant or continuous variable values are supported; 0 disables CSDA.
+        q_coeff: MFEM source in angular-flux units per cm, shared or a list
+            of one coefficient per angle in quadrature order.
+        inflow: Incoming angular flux as an MFEM coefficient or per-angle list.
+            Prescribe the high-energy trace and spatial inflow (left for mu > 0,
+            right for mu < 0); low energy is outflow.
+        dir_bdr1, dir_bdr2: Spatial and energy boundary markers from
+            :func:`~bfp.assemble.BoundaryConditions`; retain both energy faces.
+        iter_, tol, p_level: :func:`GMRES_solver` controls.
+        visualize, save (bool): Render angular fluxes and write per-angle flux files.
+        return_info (bool): Include global convergence diagnostics.
+
+    Returns:
+        list or tuple: ``(mu, weight, GridFunction)`` entries, or ``(fluxes, info)``.
+        Info contains the :func:`GMRES_solver` fields plus ``true_residual_norm``
+        (Euclidean norm of A*psi-b) and ``relative_true_residual`` (divided by
+        the RHS norm, or None for zero RHS). Nonconvergence returns the iterate
+        with a warning. Material coefficients may depend on position and energy.
     """
     mass_tr = assemble.Mass_Matrix(fes, transport_coeff)
     return _solve_coupled(
@@ -235,12 +378,24 @@ def Solve_GFP2(
     save=True,
     return_info=False,
 ):
-    """Solve GFP2-CSDA with alpha > 0, beta >= 0 and an auxiliary DG variable.
+    """Solve GFP2–CSDA using the angular operator ``alpha*L*(I-beta*L)^(-1)``.
 
-    Arguments/output follow Solve_FP. Coefficients may vary in (x,E); align
-    material interfaces with the mesh. chi has no independent inflow data.
-    gfp2_coefficients converts elastic relaxation cross sections to alpha,beta.
-    With S=absorption=0, use even angular order for the GSSmoother.
+    This operator enters with a minus sign on the left-hand side, replacing
+    the FP scattering term. ``alpha_coeff`` is an MFEM coefficient in inverse
+    cm, finite and strictly positive at mass-integration points. ``beta_coeff``
+    is dimensionless, finite and nonnegative there. They are distinct from
+    the DG flux parameters in :func:`Solve_Psi`. Use
+    :func:`~bfp.coeff.gfp2_coefficients` to convert elastic relaxation cross sections.
+
+    All other parameters, units, inflow conditions and return values follow
+    :func:`Solve_FP`. Coefficients may vary in ``(x, E)``; align material
+    interfaces with the mesh. The auxiliary DG variable ``chi`` satisfies
+    ``(I-beta*L)*chi=psi`` and needs no independent inflow data. It is not
+    returned; the true residual diagnostics include the entire auxiliary system.
+
+    With stopping power and absorption both zero, use even angular order to
+    avoid a zero transport diagonal in GSSmoother. Nonconvergence warns and
+    returns the current angular flux approximation.
     """
     mass_alpha = assemble.Mass_Matrix(fes, alpha_coeff, positive=True)
     mass_beta = assemble.Mass_Matrix(fes, beta_coeff)

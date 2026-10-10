@@ -19,7 +19,15 @@ __all__ = [
 
 
 def gfp2_coefficients(sigma_a1, sigma_a2):
-    """Map elastic angular relaxation cross sections (not absorption) to alpha, beta."""
+    """Convert two elastic angular relaxation cross sections to GFP2 alpha and beta.
+
+    ``sigma_a1`` and ``sigma_a2`` are the first and second relaxation cross
+    sections (inverse cm), not absorption. Scalars or broadcastable arrays
+    must satisfy ``0 < sigma_a1 < sigma_a2 <= 3*sigma_a1`` and be finite.
+    Return ``(alpha, beta)`` as NumPy scalars/arrays: alpha has inverse-length
+    units and beta is dimensionless. Invalid values raise ValueError.
+    ``sigma_a2 == 3*sigma_a1`` gives the FP limit beta=0.
+    """
     sigma_a1 = np.asarray(sigma_a1, dtype=float)
     sigma_a2 = np.asarray(sigma_a2, dtype=float)
     if (
@@ -38,34 +46,20 @@ def gfp2_coefficients(sigma_a1, sigma_a2):
 
 
 class TotalXSCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the total macroscopic cross-section Σ_t(E).
-    (This coefficient will be updated for Σ_t(x,E))
-
-    This class provides a piecewise-constant coefficient function based on energy groups.
-    The energy range is defined from E_start (higher energy) to E_end (lower energy),
-    with energy values sorted in descending order. The corresponding total cross-section
-    values in xs_t_data are also arranged from higher to lower energy. This ordering is based
-    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
-    loss of charged particles is treated as a continuous process, naturally leading to a descending
-    energy order.
-
-    Attributes:
-        E_start (float): Upper bound of the energy range.
-        E_end (float): Lower bound of the energy range.
-        xs_t_data (array-like or float): Total cross-section values per energy group,
-            or a constant value.
+    """Energy-dependent macroscopic removal coefficient in inverse cm.
 
     Args:
-        xs_t_data (float or list of float): Total cross-section data (constant or group-based).
-        E_start (float): Start energy for energy group mapping.
-        E_end (float): End energy for energy group mapping.
+        xs_t_data: Scalar constant or values on uniform energy intervals,
+            ordered from high to low energy.
+        E_start, E_end (float): High and low energy bounds in MeV, with
+            E_start > E_end for grouped data; ignored for scalar data.
 
-    Examples:
-        Constant cross-section:
-            TotalXSCoefficientE(1.0, E_start=1.0, E_end=0.01)
-
-        Energy-dependent cross-section:
-            TotalXSCoefficientE(xs_t_data, E_start=1.0, E_end=0.01)
+    Evaluation uses physical energy ``x[1]``. Group ordering is a data-lookup
+    convention, not a transformed mesh coordinate. Values close to an internal
+    edge use the lower-energy group; unmatched energies return the last value,
+    including values outside the supplied range. Supply valid bounds/data;
+    this helper does not validate them. In CSDA this is removal, not an
+    angular scattering gain. For FP/GFP2 supply genuine absorption separately.
     """
 
     def __init__(self, xs_t_data, E_start, E_end):
@@ -102,34 +96,13 @@ class TotalXSCoefficientE(mfem.PyCoefficient):
 
 
 class ScatteringXSCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the scattering cross-section Σ_s(E).
-    (This coefficient will be updated for Σ_s(x,E))
+    """Energy-group total elastic scattering cross section in inverse cm.
 
-    This class provides a piecewise-constant coefficient function based on energy groups.
-    The energy range is defined from E_start (higher energy) to E_end (lower energy),
-    with energy values sorted in descending order. The corresponding scattering cross-section
-    values in xs_s_data are also arranged from higher to lower energy. This ordering is based
-    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
-    loss of charged particles is treated as a continuous process, naturally leading to a descending
-    energy order.
-
-    Attributes:
-        E_start (float): Upper bound of the energy range.
-        E_end (float): Lower bound of the energy range.
-        xs_s_data (array-like or float): Scattering cross-section values per energy group,
-            or a constant value.
-
-    Args:
-        xs_s_data (float or list of float): Scattering cross-section data (constant or group-based).
-        E_start (float): Start energy for energy group mapping.
-        E_end (float): End energy for energy group mapping.
-
-    Examples:
-        Constant cross-section:
-            ScatteringXSCoefficientE(1.0, E_start=1.0, E_end=0.01)
-
-        Energy-dependent cross-section:
-            ScatteringXSCoefficientE(xs_s_data, E_start=1.0, E_end=0.01)
+    ``xs_s_data`` is a scalar or values ordered from high to low energy.
+    ``E_start``/``E_end`` specify the high/low bounds in MeV. Lookup and scalar
+    handling follow :class:`TotalXSCoefficientE`. This helper is not automatically
+    coupled to any solver. A total scattering cross section is not the elastic
+    transport cross section required by :func:`~bfp.solver.Solve_FP`.
     """
 
     def __init__(self, xs_s_data, E_start, E_end):
@@ -166,34 +139,14 @@ class ScatteringXSCoefficientE(mfem.PyCoefficient):
 
 
 class StoppingPowerCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the stopping power S(E).
-    (This coefficient will be updated for S(x,E))
+    """Positive stopping power S(E) in MeV/cm for the conservative term -d_E(S*psi).
 
-    This class provides a piecewise-constant coefficient function based on energy groups.
-    The energy range is defined from E_start (higher energy) to E_end (lower energy),
-    with energy values sorted in descending order. The corresponding stopping power
-    values in S_data are also arranged from higher to lower energy. This ordering is based
-    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
-    loss of charged particles is treated as a continuous process, naturally leading to a descending
-    energy order.
-
-    Attributes:
-        E_start (float): Upper bound of the energy range.
-        E_end (float): Lower bound of the energy range.
-        S_data (array-like or float): Stopping power values per energy group,
-            or a constant value.
-
-    Args:
-        S_data (float or list of float): Stopping power data (constant or group-based).
-        E_start (float): Start energy for energy group mapping.
-        E_end (float): End energy for energy group mapping.
-
-    Examples:
-        Constant stopping power:
-            StoppingPowerCoefficientE(1.0, E_start=1.0, E_end=0.01)
-
-        Energy-dependent stopping power:
-            StoppingPowerCoefficientE(S_data, E_start=1.0, E_end=0.01)
+    ``S_data`` is a scalar or group values ordered from high to low energy;
+    ``E_start``/``E_end`` are the high/low bounds in MeV. Lookup follows
+    :class:`TotalXSCoefficientE` at physical energy ``x[1]``; positivity is
+    not enforced by this helper. Grouped values are piecewise constant.
+    Transport across discontinuous stopping-power interfaces remains unverified;
+    constant and continuous variable-S cases have been verified.
     """
 
     def __init__(self, S_data, E_start, E_end):
@@ -230,34 +183,12 @@ class StoppingPowerCoefficientE(mfem.PyCoefficient):
 
 
 class QCoefficientE(mfem.PyCoefficient):
-    """Coefficient class for the energy-dependent source term Q(E).
-    (This coefficient will be updated for Q(x,E))
+    """Isotropic source data Q(E), in angular-flux units per cm.
 
-    This class provides a piecewise-constant coefficient function based on energy groups.
-    The energy range is defined from E_start (higher energy) to E_end (lower energy),
-    with energy values sorted in descending order. The corresponding source term values
-    in Q_data are also arranged from higher to lower energy. This ordering is based on the
-    logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy loss
-    of charged particles is treated as a continuous process, naturally leading to a descending
-    energy order.
-
-    Attributes:
-        E_start (float): Higher energy bound of the energy range.
-        E_end (float): Lower energy bound of the energy range.
-        Q_data (array-like or float): Energy-dependent source term values per energy group,
-            or a constant value.
-
-    Args:
-        Q_data (float or list of float): Source term data (constant or group-based).
-        E_start (float): Start energy for energy group mapping (higher energy).
-        E_end (float): End energy for energy group mapping (lower energy).
-
-    Examples:
-        Constant source term:
-            QCoefficient(1.0, E_start=1.0, E_end=0.01)
-
-        Energy-dependent source term:
-            QCoefficient(Q_data, E_start=1.0, E_end=0.01)
+    ``Q_data`` is a scalar or uniform-group values ordered from high to low
+    energy. ``E_start``/``E_end`` are the high/low bounds in MeV. Lookup and
+    scalar handling follow :class:`TotalXSCoefficientE`. This is the source
+    per angular direction, not an angle-integrated source.
     """
 
     def __init__(self, Q_data, E_start, E_end):
@@ -294,6 +225,16 @@ class QCoefficientE(mfem.PyCoefficient):
 
 
 class QFuncCoefficient(mfem.PyCoefficient):
+    """Manufactured source for constant-S CSDA in physical (x, E).
+
+    ``pn=3,4,5`` selects flux ``a_val+b_val*x``, ``a_val+b_val*E`` or
+    ``a_val+b_val*x*E``. The source is ``mu_val*d_x(psi) - S_val*d_E(psi)
+    + xs_t_val*psi``, with removal ``xs_t_val`` in inverse cm and stopping
+    power ``S_val`` in MeV/cm. Flux coefficients must have corresponding
+    units. ``q_const`` is retained for compatibility and is not used.
+    For variable S, supply a separate source including the derivative of S.
+    """
+
     def __init__(self, pn, a_val=0, b_val=0, xs_t_val=0, mu_val=0, S_val=0, q_const=0):
         super(QFuncCoefficient, self).__init__()
         self.pn = pn
@@ -332,33 +273,12 @@ class QFuncCoefficient(mfem.PyCoefficient):
 
 
 class EDependentCoefficient(mfem.PyCoefficient):
-    """Coefficient class for energy-dependent values.
+    """Generic scalar or piecewise-constant function of physical energy x[1].
 
-    This class provides a piecewise-constant coefficient function based on energy groups.
-    The energy range is defined from E_start (higher energy) to E_end (lower energy),
-    with energy values sorted in descending order. The corresponding energy-dependent
-    values in data are also arranged from higher to lower energy. This ordering is based
-    on the logic of the Continuous Slowing Down Approximation (CSDA) approach, where the energy
-    loss of charged particles is treated as a continuous process, naturally leading to a descending
-    energy order.
-
-    Attributes:
-        E_start (float): Upper bound of the energy range.
-        E_end (float): Lower bound of the energy range.
-        data (array-like or float): Energy-dependent values per energy group,
-            or a constant value.
-
-    Args:
-        data (float or list of float): Energy-dependent data (constant or group-based).
-        E_start (float): Start energy for energy group mapping.
-        E_end (float): End energy for energy group mapping.
-
-    Examples:
-        Constant energy-dependent value:
-            EDependentCoefficient(1.0, E_start=1.0, E_end=0.01)
-
-        Energy-dependent coefficient:
-            EDependentCoefficient(data, E_start=1.0, E_end=0.01)
+    ``data`` is a scalar or uniform-group values ordered high to low;
+    ``E_start``/``E_end`` are high/low energy bounds in MeV. Lookup, edge
+    handling and out-of-range fallback follow :class:`TotalXSCoefficientE`.
+    The supplied quantity determines the coefficient units.
     """
 
     def __init__(self, data, E_start, E_end):
@@ -395,29 +315,13 @@ class EDependentCoefficient(mfem.PyCoefficient):
 
 
 class XDependentCoefficient(mfem.PyCoefficient):
-    """Coefficient for the spatial-dependent values.
+    """Scalar or piecewise-constant function of physical position x[0].
 
-    This class provides a piecewise-constant coefficient function based on spatial cell number.
-    The spatial range is defined from x_start (lower bound) to x_end (upper bound),
-    with spatial values sorted in ascending order. The corresponding spatial-dependent
-    values in data are also arranged from lower to upper according to their grouping.
-
-    Attributes:
-        x_start (float): Lower bound of the spatial range.
-        x_end (float): Upper bound of the spatial range.
-        data (array-like or float): Spatial-dependent values per cell, or a constant value.
-
-    Args:
-        data (float or list of float): Spatial-dependent data (constant or cell-based).
-        x_start (float): Start value for spatial mapping.
-        x_end (float): End value for spatial mapping.
-
-    Examples:
-        Constant spatial-dependent value:
-            XDependentCoefficient(1.0, x_start=0.0, x_end=10.0)
-
-        Spatial-dependent coefficient:
-            XDependentCoefficient(data, x_start=0.0, x_end=10.0)
+    ``data`` is a scalar constant or values on uniform intervals from
+    ``x_start`` to ``x_end`` in increasing position order (cm in examples).
+    Bounds are ignored for scalar data. Near an internal edge the right-hand
+    interval is selected; unmatched positions return the last value, including
+    out-of-range positions. Units are those of the supplied quantity.
     """
 
     def __init__(self, data, x_start, x_end):
@@ -455,26 +359,20 @@ class XDependentCoefficient(mfem.PyCoefficient):
 
 
 class InflowCoefficient(mfem.PyCoefficient):
-    """Coefficient class for the inflow boundary condition.
-
-    For pn=3, 4, 5, evaluate the manufactured solution on the boundary;
-    a_val and b_val specify its coefficients. Flux integrators select inflow.
-
-    This class represents a coefficient for the inflow boundary condition.
-    The coefficient returns a specified inflow value based on the angular direction `mu` and
-    optional boundary flags. If `xl` is set to True, the coefficient returns the inflow value
-    only when `mu < 0` (left boundary). If `xr` is set to True, the coefficient returns the
-    inflow value only when `mu > 0` (right boundary). If both flags are True or if neither flag
-    is provided (default), the inflow value is returned unconditionally.
+    """Incoming angular flux coefficient, including manufactured boundary traces.
 
     Args:
-        inflow (float): The inflow value to be used.
-        mu (float): The angular direction (e.g., cosine of the angle) used to determine if the
-            inflow condition is met.
-        xl (bool, optional): If True, apply the inflow condition on the left boundary (when mu > 0).
-            Defaults to None.
-        xr (bool, optional): If True, apply the inflow condition on the right boundary (when mu < 0).
-            Defaults to None.
+        inflow (float): Constant incoming angular flux.
+        mu (float): Direction cosine.
+        xl, xr (bool): If only xl is True, return inflow for mu > 0 and zero
+            otherwise. If only xr is True, return inflow for mu < 0 and zero
+            otherwise. Both or neither enables the constant for all directions.
+        pn (int): For 3, 4 or 5, override the constant/flags with the exact
+            manufactured trace a+b*x, a+b*E or a+b*x*E, respectively.
+        a_val, b_val (float): Manufactured flux coefficients, with consistent units.
+
+    DG flux integrators select the incoming faces, including the high-energy
+    face for S > 0. These flags do not identify the location of a mesh face.
     """
 
     def __init__(self, inflow, mu, xl=None, xr=None, pn=None, a_val=0, b_val=0):
@@ -488,18 +386,7 @@ class InflowCoefficient(mfem.PyCoefficient):
         self.b_val = b_val
 
     def EvalValue(self, x):
-        """Evaluate the inflow coefficient.
-
-        Depending on the specified boundary flags, this method returns the inflow value only if
-        the corresponding condition based on `mu` is satisfied. If neither or both boundary flags
-        are provided, the inflow value is returned unconditionally.
-
-        Args:
-            x (list or array-like): Input point.
-
-        Returns:
-            float: The inflow value if the condition is met, otherwise 0.0.
-        """
+        """Return the manufactured trace or direction-filtered inflow at (x, E)."""
 
         # MMS traces apply on each inflow face, including E_max.
         if self.pn == 3:
@@ -526,14 +413,7 @@ class InflowCoefficient(mfem.PyCoefficient):
 
 
 class ConstantCoefficient(mfem.PyCoefficient):
-    """Coefficient that always returns a constant value.
-
-    This class represents a coefficient that returns the same constant value for any input.
-    It is useful in finite element computations where a uniform property or parameter is needed.
-
-    Args:
-        const (float): The constant value to be returned.
-    """
+    """MFEM scalar coefficient returning ``const`` everywhere; units are caller-defined."""
 
     def __init__(self, const):
         super(ConstantCoefficient, self).__init__()
@@ -544,22 +424,11 @@ class ConstantCoefficient(mfem.PyCoefficient):
 
 
 def VectorConstCoefficient(vel1, vel2=None, vel3=None):
-    """
-    Create and return a constant velocity vector coefficient using mfem.VectorConstantCoefficient.
+    """Return an MFEM VectorConstantCoefficient from one, two or three components.
 
-    This function instantiates a VectorConstCoefficient that returns a constant velocity vector.
-    The dimensionality of the vector is determined by the number of velocity values provided:
-      - 1D if only vel1 is provided.
-      - 2D if both vel1 and vel2 are provided.
-      - 3D if vel1, vel2, and vel3 are provided.
-
-    Args:
-        vel1 (float): Constant velocity value for the x-direction.
-        vel2 (float, optional): Constant velocity value for the y-direction. Defaults to None.
-        vel3 (float, optional): Constant velocity value for the z-direction. Defaults to None.
-
-    Returns:
-        VectorConstCoefficient: An instance of VectorConstCoefficient representing the constant velocity vector.
+    ``vel1`` is required; ``vel2`` and ``vel3`` add components in coordinate
+    order. For coupled (x, E) transport, streaming uses ``(mu, 0)`` and energy
+    convection uses ``(0, -S)``. Components carry the corresponding velocity units.
     """
     if vel2 is None:
         return mfem.VectorConstantCoefficient([vel1])

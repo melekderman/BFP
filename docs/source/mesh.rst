@@ -1,8 +1,6 @@
-bfp.mesh module
-===============
+Mesh helpers
+============
 
 .. automodule:: bfp.mesh
    :members:
-   :undoc-members:
-   :show-inheritance:
 

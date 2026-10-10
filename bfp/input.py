@@ -1,5 +1,6 @@
 # input.py
 import os
+import mfem.ser as mfem
 
 os.environ["DISPLAY"] = ":0"
 
@@ -7,7 +8,7 @@ from bfp.mesh import create_2D_mesh
 from bfp.assemble import FESpace, BoundaryConditions
 from bfp.coeff import TotalXSCoefficientE
 from bfp.angular import gauss_legendre_dirs
-from bfp.solver import Solve_Psi, Solve_Phi
+from bfp.solver import Solve_Psi, Solve_Phi, Solve_Transport
 
 __all__ = [
     "problem1_input",
@@ -15,6 +16,7 @@ __all__ = [
     "problem3_input",
     "problem4_input",
     "problem5_input",
+    "slab_input",
 ]
 
 
@@ -415,6 +417,73 @@ def problem5_input(
     )
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
+    return phi
+
+
+def slab_input(
+    model,
+    nx=10,
+    nE=10,
+    N_ang=2,
+    iter_=1000,
+    tol=1e-12,
+    p_level=1,
+    *,
+    visualize=True,
+    save=True,
+    return_info=False,
+):
+    """Run the fixed FP/GFP2 slab example with zero spatial/high-energy inflow.
+
+    ``model`` is ``"fp"`` or ``"gfp2"``. The domain is x in [0, 1] cm and
+    E in [0, 1] MeV, with ``nx`` by ``nE`` first-order DG elements and
+    ``N_ang`` Gauss–Legendre directions. Stopping power is 1 MeV/cm,
+    absorption is 1 inverse cm and isotropic source is 1 in flux units per cm.
+    Low energy is outflow. FP uses transport cross section 1 inverse cm;
+    GFP2 uses alpha=0.6 inverse cm and beta=0.1 (dimensionless).
+
+    Solver and output controls follow :func:`~bfp.solver.Solve_Transport`.
+    Return the scalar-flux GridFunction, or ``(phi, global_diagnostics)``
+    when ``return_info=True``. Mesh creation still writes a mesh file when
+    ``save=False``. This is not the Leakeas–Larsen benchmark.
+    """
+    if model not in ("fp", "gfp2"):
+        raise ValueError("The slab example supports only 'fp' and 'gfp2'.")
+    mesh = create_2D_mesh(nx, nE, 0.0, 1.0, 0.0, 1.0)
+    fes = FESpace(1, mesh)
+    mu_vals, w_vals = gauss_legendre_dirs(N_ang)
+    dir_bdr1, dir_bdr2 = BoundaryConditions(mesh)
+    one = mfem.ConstantCoefficient(1.0)
+    if model == "fp":
+        scattering = dict(transport_coeff=one)
+    else:
+        scattering = dict(
+            alpha_coeff=mfem.ConstantCoefficient(0.6),
+            beta_coeff=mfem.ConstantCoefficient(0.1),
+        )
+    flux, info = Solve_Transport(
+        model,
+        mu_vals=mu_vals,
+        w_vals=w_vals,
+        mesh=mesh,
+        fes=fes,
+        absorption_coeff=one,
+        S_coeff=one,
+        q_coeff=one,
+        inflow=mfem.ConstantCoefficient(0.0),
+        dir_bdr1=dir_bdr1,
+        dir_bdr2=dir_bdr2,
+        **scattering,
+        iter_=iter_,
+        tol=tol,
+        p_level=p_level,
+        visualize=visualize,
+        save=save,
+        return_info=True,
+    )
+    phi = Solve_Phi(fes, flux, save=save)
     if return_info:
         return phi, info
     return phi

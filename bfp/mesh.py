@@ -7,18 +7,15 @@ __all__ = ["create_2D_mesh", "create_3D_mesh"]
 
 
 def create_2D_mesh(nx, ny, x_start, x_end, y_start, y_end):
-    """Creates a 2D mesh with the specified intervals and coordinate ranges.
+    """Return a structured quadrilateral MFEM mesh with nx-by-ny elements.
 
-    Args:
-        nx (int): Number of intervals in the x-direction.
-        ny (int): Number of intervals in the y-direction.
-        x_start (float): Starting x-coordinate.
-        x_end (float): Ending x-coordinate.
-        y_start (float): Starting y-coordinate.
-        y_end (float): Ending y-coordinate.
+    ``x_start``/``x_end`` and ``y_start``/``y_end`` give coordinate bounds.
+    For transport, use increasing position bounds in cm and physical kinetic
+    energy bounds in MeV; ``ny`` counts energy elements. The solver uses this
+    single coupled (x, E) mesh, not separate spatial and energy meshes.
 
-    Returns:
-        mesh: The updated mesh with vertex coordinates set accordingly.
+    Creates ``mesh/usr/`` in the working directory and writes
+    ``{nx}x{ny}_2D.mesh`` if absent, independently of solver output controls.
     """
 
     x_coords = np.linspace(x_start, x_end, nx + 1)
@@ -84,21 +81,12 @@ for k, v in enumerate(verts):
 
 
 def create_3D_mesh(nx, ny, nz, x_start, x_end, y_start, y_end, z_start, z_end):
-    """Creates a 3D mesh with specified intervals and coordinate ranges.
+    """Return a structured hexahedral MFEM mesh with nx-by-ny-by-nz elements.
 
-    Args:
-        nx (int): Number of intervals in the x-direction.
-        ny (int): Number of intervals in the y-direction.
-        nz (int): Number of intervals in the z-direction.
-        x_start (float): Starting x-coordinate.
-        x_end (float): Ending x-coordinate.
-        y_start (float): Starting y-coordinate.
-        y_end (float): Ending y-coordinate.
-        z_start (float): Starting z-coordinate.
-        z_end (float): Ending z-coordinate.
-
-    Returns:
-        mesh: The updated 3D mesh with vertex coordinates set accordingly.
+    The start/end arguments bound each coordinate. This is a geometry helper;
+    BFP's transport solvers currently support only the two-coordinate (x, E)
+    slab formulation. Creates ``mesh/usr/{nx}x{ny}_3D.mesh`` if absent in the
+    working directory; the legacy filename does not include nz.
     """
 
     x_coords = np.linspace(x_start, x_end, nx + 1)

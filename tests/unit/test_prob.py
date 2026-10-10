@@ -9,7 +9,7 @@ from unittest.mock import patch
 import mfem.ser as mfem
 import numpy as np
 
-from bfp import gauss_legendre_dirs
+from bfp import gauss_legendre_dirs, Solve_Transport
 from bfp.angular import (
     gauss_legendre_dirs as angular_dirs,
     integrate_angular_flux,
@@ -31,6 +31,7 @@ from bfp.input import (
     problem3_input,
     problem4_input,
     problem5_input,
+    slab_input,
 )
 from bfp.mesh import create_2D_mesh
 from bfp.solver import (
@@ -64,6 +65,176 @@ class TestProblems(unittest.TestCase):
         display = patch("bfp.vis.GlVis_2D")
         display.start()
         self.addCleanup(display.stop)
+
+    def test_transport_dispatch(self):
+        mesh = mfem.Mesh(2, 3, "QUADRILATERAL", True, 1.0, 1.0)
+        fes = FESpace(1, mesh)
+        mu, weights = angular_dirs(4)
+        c = mfem.ConstantCoefficient
+        markers = BoundaryConditions(mesh)
+        common = dict(
+            mu_vals=mu,
+            w_vals=weights,
+            mesh=mesh,
+            fes=fes,
+            S_coeff=AnalyticCoefficient(lambda x: 1.0 + x[1]),
+            q_coeff=c(1.0),
+            inflow=c(0.0),
+            dir_bdr1=markers[0],
+            dir_bdr2=markers[1],
+            visualize=False,
+            save=False,
+            p_level=0,
+        )
+        cases = [
+            (
+                "csda",
+                Solve_Psi,
+                dict(
+                    pn=1,
+                    xs_t_coeff=c(1.0),
+                    xs_t_const=1.0,
+                    S_const=1.0,
+                    alpha=1.0,
+                    beta=0.5,
+                    a_const=0.0,
+                    b_const=0.0,
+                ),
+            ),
+            ("fp", Solve_FP, dict(absorption_coeff=c(1.0), transport_coeff=c(1.0))),
+            (
+                "gfp2",
+                Solve_GFP2,
+                dict(
+                    absorption_coeff=c(1.0),
+                    alpha_coeff=c(0.6),
+                    beta_coeff=c(0.1),
+                ),
+            ),
+        ]
+        for model, solve, coefficients in cases:
+            for limit in (1000, 1):
+                with (
+                    self.subTest(model=model, limit=limit),
+                    warnings.catch_warnings(record=True),
+                ):
+                    args = dict(common, **coefficients, iter_=limit)
+                    direct, expected = solve(**args, return_info=True)
+                    dispatched, info = Solve_Transport(model, **args, return_info=True)
+                    default = Solve_Transport(model, **args)
+                    self.assertEqual(info, expected)
+                    diagnostics = info if model == "csda" else [info]
+                    self.assertTrue(
+                        all(d["converged"] == (limit == 1000) for d in diagnostics)
+                    )
+                    for a, b, d in zip(direct, dispatched, default):
+                        self.assertEqual(a[:2], b[:2])
+                        np.testing.assert_array_equal(
+                            a[2].GetDataArray(), b[2].GetDataArray()
+                        )
+                        np.testing.assert_array_equal(
+                            a[2].GetDataArray(), d[2].GetDataArray()
+                        )
+                    direct_phi = Solve_Phi(fes, direct, save=False)
+                    dispatched_phi = Solve_Phi(fes, dispatched, save=False)
+                    np.testing.assert_array_equal(
+                        direct_phi.GetDataArray(), dispatched_phi.GetDataArray()
+                    )
+        self.assertEqual(os.listdir(), [])
+
+    def test_transport_argument_validation(self):
+        c = mfem.ConstantCoefficient(1.0)
+        common = dict(
+            mu_vals=[0.0],
+            w_vals=[2.0],
+            mesh=None,
+            fes=None,
+            absorption_coeff=c,
+            S_coeff=c,
+            q_coeff=c,
+            inflow=c,
+            dir_bdr1=None,
+            dir_bdr2=None,
+        )
+        with patch("bfp.assemble.Mass_Matrix") as mass:
+            with self.assertRaisesRegex(ValueError, "Unknown transport model"):
+                Solve_Transport("unknown")
+            for model, scattering in [
+                ("fp", dict(transport_coeff=c)),
+                ("gfp2", dict(alpha_coeff=c, beta_coeff=c)),
+            ]:
+                for name in scattering:
+                    args = dict(common, **scattering)
+                    del args[name]
+                    with self.assertRaisesRegex(TypeError, name):
+                        Solve_Transport(model, **args)
+                    args[name] = None
+                    with self.assertRaisesRegex(TypeError, name):
+                        Solve_Transport(model, **args)
+                with self.assertRaisesRegex(TypeError, "xs_t_coeff"):
+                    Solve_Transport(model, **common, **scattering, xs_t_coeff=c)
+            mass.assert_not_called()
+
+    def test_cli_models_and_slab(self):
+        numerical = ["--nx", "2", "--nE", "3", "--N_ang", "4", "--p_level", "0"]
+        for model in ("fp", "gfp2"):
+            for limit in (1000, 1):
+                output = io.StringIO()
+                argv = [
+                    "bfp",
+                    "--model",
+                    model,
+                    "-p",
+                    "slab",
+                    "--iter_",
+                    str(limit),
+                    *numerical,
+                ]
+                with (
+                    patch("sys.argv", argv),
+                    contextlib.redirect_stdout(output),
+                    warnings.catch_warnings(record=True),
+                ):
+                    main()
+                expected = (
+                    "GMRES converged"
+                    if limit == 1000
+                    else "Saved results are unconverged"
+                )
+                self.assertIn(expected, output.getvalue())
+        for problem in range(1, 6):
+            outputs = []
+            for model_args in ([], ["--model", "csda"]):
+                output = io.StringIO()
+                with (
+                    patch(
+                        "sys.argv", ["bfp", "-p", str(problem), *model_args, *numerical]
+                    ),
+                    contextlib.redirect_stdout(output),
+                ):
+                    main()
+                outputs.append(output.getvalue().splitlines()[-1])
+            self.assertEqual(outputs[0], outputs[1])
+        invalid = [
+            ["--model", "unknown", "-p", "slab"],
+            ["--model", "csda", "-p", "slab"],
+            ["--model", "fp", "-p", "1"],
+            ["--model", "gfp2", "-p", "5"],
+            ["--model", "fp"],
+            ["-p", "6"],
+        ]
+        with patch("bfp.input.create_2D_mesh") as create_mesh:
+            for args in invalid:
+                with (
+                    patch("sys.argv", ["bfp", *args]),
+                    contextlib.redirect_stderr(io.StringIO()),
+                ):
+                    with self.assertRaises(SystemExit) as error:
+                        main()
+                    self.assertEqual(error.exception.code, 2)
+            with self.assertRaisesRegex(ValueError, "slab example"):
+                slab_input("csda")
+            create_mesh.assert_not_called()
 
     def test_angular_integration(self):
         self.assertIs(gauss_legendre_dirs, angular_dirs)
