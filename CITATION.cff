@@ -15,7 +15,7 @@ authors:
     affiliation: Oregon State University
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.15107101
+    value: 10.5281/zenodo.23280778
     description: The URL of version 0.2.0 of the software
 repository-code: 'https://github.com/melekderman/BFP.git'
 abstract: >-
