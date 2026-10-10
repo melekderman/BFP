@@ -1,3 +1,5 @@
+import warnings
+
 import mfem.ser as mfem
 from bfp import assemble, vis, coeff
 
@@ -7,7 +9,8 @@ __all__ = ['GMRES_solver',
             'Solve_Psi',
            ]
 
-def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1):
+def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
+    """Optionally return (psi, info), with MFEM's preconditioned residual norm."""
     prec = mfem.GSSmoother(A)
     solver = mfem.GMRESSolver()
     solver.SetOperator(A)
@@ -19,6 +22,16 @@ def GMRES_solver(A, b, psi, iter_=1000, tol=1e-12, p_level=1):
     solver.SetPrintLevel(p_level)
     solver.Mult(b, psi)
 
+    info = dict(converged=solver.GetConverged(),
+                iterations=solver.GetNumIterations(),
+                final_norm=solver.GetFinalNorm())
+    if not info['converged']:
+        warnings.warn(
+            f"GMRES did not converge after {info['iterations']} iterations "
+            f"(reported residual norm: {info['final_norm']:.6g}).",
+            RuntimeWarning, stacklevel=2)
+    if return_info:
+        return psi, info
     return psi
 
 
@@ -46,13 +59,14 @@ def Solve_Phi(fes, psi_mu_list, *, save=True):
 
 def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_const, 
               alpha, beta, dir_bdr1, dir_bdr2, a_const, b_const, q_const=0, E_start=0, E_end=0, iter_=1000, tol=1e-12, p_level=1,
-              *, S_coeff=None, q_coeff=None, visualize=True, save=True):
+              *, S_coeff=None, q_coeff=None, visualize=True, save=True, return_info=False):
     """Solve in physical (x, E); S_coeff overrides positive S_const.
 
     S_coeff is a continuous MFEM scalar coefficient. For variable-S MMS,
     supply q_coeff including -d(S*psi)/dE and the exact inflow coefficient.
     Both energy faces must be marked: high-E inflow and low-E outflow.
     Set visualize=False and save=False to disable GLVis and flux files.
+    With return_info=True, return (angular fluxes, per-angle diagnostics).
     """
     if S_coeff is not None and pn in (3, 4, 5) and q_coeff is None:
         raise ValueError("Variable-S manufactured solutions require q_coeff.")
@@ -63,6 +77,7 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
     v_coeff2 = mfem.ScalarVectorProductCoefficient(S_coeff, energy_direction)
 
     psi_mu_list = []
+    info_list = []
 
     for mu, w in zip(mu_vals, w_vals):
         a = a_const
@@ -85,11 +100,14 @@ def Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const, inflow, S_
                                  dir_bdr1, dir_bdr2, alpha=alpha, beta=beta)
 
         psi = Initial_Guess(fes, 1.0)
-        GMRES_solver(A, b, psi, iter_, tol, p_level)
+        psi, info = GMRES_solver(A, b, psi, iter_, tol, p_level, return_info=True)
         if visualize:
             vis.GlVis_2D(mesh, psi)
         if save:
             psi.Save("psi_hs_mu_{:.3f}.gf".format(mu))
         psi_mu_list.append((mu, w, psi))
+        info_list.append(dict(mu=float(mu), **info))
 
+    if return_info:
+        return psi_mu_list, info_list
     return psi_mu_list

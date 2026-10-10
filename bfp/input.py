@@ -16,7 +16,7 @@ __all__ = ['problem1_input',
         'problem5_input',
         ]
 
-def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
     Executes Problem 1: Infinite Medium Problem, ψ = Q/σₜ
 
@@ -27,6 +27,7 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
 
     Returns:
         phi: The computed solution.
@@ -64,16 +65,18 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
+    psi_mu_pos_list, info = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
                                  a_const=a, b_const=b, q_const=q_const,
                                  E_start=E_start, E_end=E_end,
-                                 iter_=iter_, tol=tol, p_level=p_level)
+                                 iter_=iter_, tol=tol, p_level=p_level, return_info=True)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
     Executes Problem 2: S=0 Problem,  ψ(x) = ψₗ * exp(-σₜ * x / μ).
 
@@ -84,6 +87,7 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
 
     Returns:
         phi: The computed solution.
@@ -120,16 +124,18 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
+    psi_mu_pos_list, info = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
                                  a_const=a, b_const=b, q_const=q_const,
                                  E_start=E_start, E_end=E_end,
-                                 iter_=iter_, tol=tol, p_level=p_level)
+                                 iter_=iter_, tol=tol, p_level=p_level, return_info=True)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
     Executes Problem 3: MMS Problem,  ψ = a + b * x.
     
@@ -140,6 +146,7 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose output, 0 for silent operation).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
     
     Returns:
         phi: The computed solution for Problem 3.
@@ -176,16 +183,18 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: first calculate psi, then calculate phi.
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
+    psi_mu_pos_list, info = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
                                  a_const=a, b_const=b, q_const=q_const,
                                  E_start=E_start, E_end=E_end,
-                                 iter_=iter_, tol=tol, p_level=p_level)
+                                 iter_=iter_, tol=tol, p_level=p_level, return_info=True)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
     Executes Problem 4: MMS Problem, ψ = a + b * E.
     
@@ -196,6 +205,7 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose output, 0 for silent operation).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
     
     Returns:
         phi: The computed solution for Problem 4.
@@ -232,16 +242,18 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: first calculate psi, then calculate phi.
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
+    psi_mu_pos_list, info = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
                                  a_const=a, b_const=b, q_const=q_const,
                                  E_start=E_start, E_end=E_end,
-                                 iter_=iter_, tol=tol, p_level=p_level)
+                                 iter_=iter_, tol=tol, p_level=p_level, return_info=True)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
-def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
+def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1, *, return_info=False):
     """
     Executes Problem 5: ψ = a + b * xE.
     
@@ -252,6 +264,7 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
         iter_ (int): Maximum number of solver iterations.
         tol (float): Solver tolerance.
         p_level (int): Print level (1 for verbose, 0 for silent).
+        return_info (bool): Return (phi, per-angle diagnostics) when True.
     
     Returns:
         phi: The computed solution.
@@ -287,11 +300,13 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     mu_vals, w_vals = gauss_legendre_dirs(N_ang)
 
     # Compute solution: Calculate psi and then phi
-    psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
+    psi_mu_pos_list, info = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a_const=a, b_const=b, iter_=iter_, tol=tol, p_level=p_level)
+                                 a_const=a, b_const=b, iter_=iter_, tol=tol, p_level=p_level, return_info=True)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
+    if return_info:
+        return phi, info
     return phi
 
 

@@ -80,25 +80,29 @@ def main():
     
     args = parser.parse_args()
     problem_kwargs = dict(nx=args.nx, nE=args.nE, N_ang=args.N_ang,
-                          iter_=args.iter_, tol=args.tol, p_level=args.p_level)
+                          iter_=args.iter_, tol=args.tol, p_level=args.p_level,
+                          return_info=True)
     
     if args.problem == 1:
-        problem1_input(**problem_kwargs)
-        print("Problem 1 results has successfully saved.")
+        _, info = problem1_input(**problem_kwargs)
     elif args.problem == 2:
-        problem2_input(**problem_kwargs)
-        print("Problem 2 results has successfully saved.")
+        _, info = problem2_input(**problem_kwargs)
     elif args.problem == 3:
-        problem3_input(**problem_kwargs)
-        print("Problem 3 results has successfully saved.")
+        _, info = problem3_input(**problem_kwargs)
     elif args.problem == 4:
-        problem4_input(**problem_kwargs)
-        print("Problem 4 results has successfully saved.")
+        _, info = problem4_input(**problem_kwargs)
     elif args.problem == 5:
-        problem5_input(**problem_kwargs)
-        print("Problem 5 results has successfully saved.")
+        _, info = problem5_input(**problem_kwargs)
     else:
         print("Selected problem is not exist.")
+        return
+
+    failed = [entry['mu'] for entry in info if not entry['converged']]
+    if failed:
+        print(f"Problem {args.problem}: GMRES did not converge for {len(failed)} "
+              "angular direction(s). Saved results are unconverged.")
+    else:
+        print(f"Problem {args.problem}: GMRES converged for all angular directions. Results saved.")
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,9 @@
+import contextlib
+import io
 import os
 import tempfile
 import unittest
+import warnings
 from unittest.mock import patch
 
 import mfem.ser as mfem
@@ -11,6 +14,7 @@ from bfp.coeff import VectorConstCoefficient
 from bfp.input import problem1_input, problem2_input, problem3_input, problem4_input, problem5_input
 from bfp.mesh import create_2D_mesh
 from bfp.solver import Solve_Psi, Solve_Phi, GMRES_solver, Initial_Guess
+from main import main
 
 
 class AnalyticCoefficient(mfem.PyCoefficient):
@@ -32,6 +36,60 @@ class TestProblems(unittest.TestCase):
         display = patch('bfp.vis.GlVis_2D')
         display.start()
         self.addCleanup(display.stop)
+
+    def test_gmres_diagnostics(self):
+        A = mfem.SparseMatrix(4)
+        for i in range(4):
+            A.Set(i, i, 4.0)
+            if i:
+                A.Set(i, i - 1, -1.0)
+                A.Set(i - 1, i, -1.0)
+        A.Finalize()
+        rhs = mfem.Vector([1.0, 2.0, 3.0, 4.0])
+        for limit, converged in ((1000, True), (1, False)):
+            with self.subTest(limit=limit), warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always', RuntimeWarning)
+                default = mfem.Vector(4)
+                default.Assign(0.0)
+                self.assertIs(GMRES_solver(A, rhs, default, iter_=limit, p_level=0), default)
+                solution = mfem.Vector(4)
+                solution.Assign(0.0)
+                returned, info = GMRES_solver(A, rhs, solution, iter_=limit,
+                                              p_level=0, return_info=True)
+                self.assertIs(returned, solution)
+                self.assertEqual(info['converged'], converged)
+                self.assertEqual(info['iterations'], 4 if converged else 1)
+                np.testing.assert_array_equal(solution.GetDataArray(), default.GetDataArray())
+                residual = mfem.Vector(4)
+                A.Mult(solution, residual)
+                residual -= rhs
+                preconditioned = mfem.Vector(4)
+                mfem.GSSmoother(A).Mult(residual, preconditioned)
+                self.assertAlmostEqual(info['final_norm'], preconditioned.Norml2(), delta=1e-13)
+                self.assertEqual(len(caught), 0 if converged else 2)
+                for warning in caught:
+                    self.assertIs(warning.category, RuntimeWarning)
+                    self.assertIn('GMRES did not converge', str(warning.message))
+
+    def test_angle_diagnostics_and_cli(self):
+        for limit, converged in ((1000, True), (1, False)):
+            with self.subTest(limit=limit), warnings.catch_warnings(record=True):
+                phi, info = problem5_input(nx=3, nE=4, N_ang=2, iter_=limit,
+                                           p_level=0, return_info=True)
+                mu, _ = np.polynomial.legendre.leggauss(2)
+                np.testing.assert_array_equal([entry['mu'] for entry in info], mu)
+                self.assertTrue(all(entry['converged'] == converged for entry in info))
+                self.assertTrue(np.isfinite(phi.GetDataArray()).all())
+                output = io.StringIO()
+                argv = ['main.py', '-p', '5', '--nx', '3', '--nE', '4',
+                        '--N_ang', '2', '--iter_', str(limit), '--p_level', '0']
+                with patch('sys.argv', argv), contextlib.redirect_stdout(output):
+                    main()
+                if converged:
+                    self.assertIn('GMRES converged for all angular directions', output.getvalue())
+                else:
+                    self.assertIn('Saved results are unconverged', output.getvalue())
+                    self.assertNotIn('GMRES converged for all angular directions', output.getvalue())
 
     def test_optional_output(self):
         mesh = mfem.Mesh(2, 3, "QUADRILATERAL", True, 1.0, 1.0)
