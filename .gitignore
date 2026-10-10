@@ -33,6 +33,9 @@
 
 # Clones etc.
 BFP.egg-info/
+bfp_transport.egg-info/
+build/
+dist/
 bfp/__all__.py
 tests/unit/mesh/
 .version-release/

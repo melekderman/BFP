@@ -31,11 +31,28 @@ conda activate BFP-env
 ```
 ### Step 3: Install BFP
 
-Install BFP along with dependencies using:
+The distribution is named `bfp-transport`; the Python import remains `bfp`.
+Use Python 3.9–3.11. Linux x86-64 has prebuilt wheels for the pinned
+`mfem==4.7.0.1`. Install that wheel first to prevent a source-build fallback:
 
 ```bash
-pip install .
+python -m pip install --only-binary=mfem "mfem==4.7.0.1"
+python -m pip install .
 ```
+
+For an editable development installation, use `python -m pip install -e .`.
+The installed CLI is `bfp`; `python main.py` remains available in the checkout.
+
+On platforms without a matching PyMFEM wheel, provision a compatible PyMFEM
+4.7.0.1 installation separately before installing BFP. Standard dependency
+metadata cannot require binary-only packages; keep `PIP_ONLY_BINARY=mfem` set
+to reject an unavailable wheel rather than allowing pip to compile MFEM.
+BFP itself has no dependency-download or compilation hooks.
+
+BFP currently uses the serial `mfem.ser` backend. The old `setup.py --parallel`
+installer is retired: building MPI-enabled PyMFEM did not make BFP parallel.
+MPI transport support is planned as a separate development step. Any custom
+PyMFEM source build must be managed separately from BFP installation.
 
 ---
 
@@ -64,13 +81,6 @@ cd tests/unit/
 python test_coeff.py
 python test_mesh.py
 python test_prob.py
-```
-
-#### Testing in Parallel Mode *(upcoming feature)*
-
-```bash
-python test_coeff.py --parallel
-python test_mesh.py --parallel
 ```
 
 ---
