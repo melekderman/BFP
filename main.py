@@ -79,21 +79,23 @@ def main():
     )
     
     args = parser.parse_args()
+    problem_kwargs = dict(nx=args.nx, nE=args.nE, N_ang=args.N_ang,
+                          iter_=args.iter_, tol=args.tol, p_level=args.p_level)
     
     if args.problem == 1:
-        problem1_input()
+        problem1_input(**problem_kwargs)
         print("Problem 1 results has successfully saved.")
     elif args.problem == 2:
-        problem2_input()
+        problem2_input(**problem_kwargs)
         print("Problem 2 results has successfully saved.")
     elif args.problem == 3:
-        problem3_input()
+        problem3_input(**problem_kwargs)
         print("Problem 3 results has successfully saved.")
     elif args.problem == 4:
-        problem4_input()
+        problem4_input(**problem_kwargs)
         print("Problem 4 results has successfully saved.")
     elif args.problem == 5:
-        problem5_input()
+        problem5_input(**problem_kwargs)
         print("Problem 5 results has successfully saved.")
     else:
         print("Selected problem is not exist.")

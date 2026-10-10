@@ -66,7 +66,9 @@ def problem1_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: Calculate psi then phi
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+                                 a_const=a, b_const=b, q_const=q_const,
+                                 E_start=E_start, E_end=E_end,
+                                 iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi
@@ -120,7 +122,9 @@ def problem2_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: Calculate psi then phi
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+                                 a_const=a, b_const=b, q_const=q_const,
+                                 E_start=E_start, E_end=E_end,
+                                 iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi
@@ -174,7 +178,9 @@ def problem3_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: first calculate psi, then calculate phi.
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+                                 a_const=a, b_const=b, q_const=q_const,
+                                 E_start=E_start, E_end=E_end,
+                                 iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi
@@ -228,7 +234,9 @@ def problem4_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: first calculate psi, then calculate phi.
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, q_const, E_start, E_end, iter_, tol, p_level)
+                                 a_const=a, b_const=b, q_const=q_const,
+                                 E_start=E_start, E_end=E_end,
+                                 iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi
@@ -281,7 +289,7 @@ def problem5_input(nx=10, nE=10, N_ang=2, iter_=1000, tol=1e-12, p_level=1):
     # Compute solution: Calculate psi and then phi
     psi_mu_pos_list = Solve_Psi(pn, mu_vals, w_vals, mesh, fes, xs_t_coeff, xs_t_const,
                                  inflow, S_const, alpha, beta, dir_bdr1, dir_bdr2,
-                                 a, b, iter_=iter_, tol=tol, p_level=p_level)
+                                 a_const=a, b_const=b, iter_=iter_, tol=tol, p_level=p_level)
     phi = Solve_Phi(fes, psi_mu_pos_list)
 
     return phi
