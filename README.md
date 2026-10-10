@@ -1,6 +1,6 @@
 # Boltzmann Fokker–Planck Charged-Particle Transport (BFP)
 
-[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE) [![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg?branch=dev&event=push)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml?query=branch%3Adev+event%3Apush) [![Coverage](.github/badges/coverage.svg)](.github/badges/coverage.svg) [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://melekderman.github.io/BFP/)
+[![DOI](https://zenodo.org/badge/938897515.svg)](https://doi.org/10.5281/zenodo.15107100) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE) [![Unit Tests](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml/badge.svg?branch=main&event=push)](https://github.com/melekderman/BFP/actions/workflows/unit_tests.yml?query=branch%3Amain+event%3Apush) [![Coverage](.github/badges/coverage.svg)](.github/badges/coverage.svg) [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://melekderman.github.io/BFP/)
 
 ## Overview
 
